@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Queue.hpp"
 #include "Stack.hpp"
+#include "ArithmExpr.hpp"
 #include "parser.hpp"
 using namespace std;
 
