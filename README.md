@@ -35,7 +35,7 @@
 - constant real number
 
 **Name**:
-- a string of  letters and the symbol `_` and numbers. First character is a Latin letter or the symbol `_`
+- a string of Latin letters and the symbol `_` and numbers. First character is a Latin letter or the symbol `_`
 
 **End**:
 - `\n`
