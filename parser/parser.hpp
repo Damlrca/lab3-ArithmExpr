@@ -8,12 +8,12 @@
 #include "Queue.hpp"
 
 enum class TokenType {
-	Un_Operator,	//str: +(unary) -(unary)
-	Bn_Operator,	//str: +(binary) -(binary) * /
-	Sp_Operator,	//str: ( ) =
-	Number,			//val: real value
-	Name,			//str: variable name
-	End				// no: ; '\n' EOF
+	Un_Operator,  //str: +(unary) -(unary)
+	Bn_Operator,  //str: +(binary) -(binary) * /
+	Sp_Operator,  //str: ( ) =
+	Number,       //val: real value
+	Name,         //str: variable name
+	End           // no: ; '\n' EOF
 };
 
 class Token {
