@@ -13,6 +13,27 @@ private:
 
 	bool full() const { return top + 1 >= size; }
 
+	void double_size() {
+		T* temp = a.allocate(2 * size);
+
+		/*//requires ñ++17
+		std::uninitialized_move(p, p + size, temp);
+		T* last = p + size;
+		for (T* t = p; t != next; t++)
+			t->~T();
+		*/
+
+		T* last = p + (top + 1);
+		for (T* t = p, *u = temp; t != last; t++, u++) {
+			new(u) T(std::move(*t));
+			t->~T();
+		}
+
+		a.deallocate(p, size);
+		p = temp;
+		size *= 2;
+	}
+
 public:
 	Stack() : size{ 1 }, top{ -1 }, a{} {
 		p = a.allocate(size);
@@ -20,7 +41,7 @@ public:
 
 	~Stack() {
 		T* last = p + (top + 1);
-		for (T* t = p; t != last; t++)
+		for (T *t = p; t != last; t++)
 			t->~T();
 		a.deallocate(p, size);
 	}
@@ -30,36 +51,26 @@ public:
 	T pop() {
 		if (empty())
 			throw -1;
-		T temp{ p[top] };
-		(p+top)->~T();
+		T temp{ std::move(p[top]) };
+		(p + top)->~T();
 		top--;
 		return temp;
 	}
 
 	void push(const T& x) {
-		if (full()) {
-			T* temp = a.allocate(2 * size);
-			
-			/*//requires ñ++17
-			std::uninitialized_move(p, p + size, temp);
-			T* last = p + size;
-			for (T* t = p; t != next; t++)
-				t->~T();
-			*/
-
-			T* last = p + size;
-			for (T* t = p, *u = temp; t != last; t++, u++) {
-				new(u) T(std::move(*t));
-				t->~T();
-			}
-
-			a.deallocate(p, size);
-			p = temp;
-			size *= 2;
-		}
+		if (full())
+			double_size();
 		top++;
 		new(p + top) T{ x };
 	}
+
+	void push(T&& x) {
+		if (full())
+			double_size();
+		top++;
+		new(p + top) T{ x };
+	}
+
 };
 
 #endif // !__CALC_STACK_HPP__

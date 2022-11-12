@@ -17,7 +17,7 @@
 
 **Expr**:
 - `Name`
-- `Literal`
+- `Number`
 - `Operation<unary> Expr`
 - `Expr Operation<binary> Expr`
 - `( Expr )`
@@ -31,11 +31,11 @@
 - \<unary\>: `+ -`
 - \<special\>: `( ) =`
 
-**Literals**:
+**Number**:
 - constant real number
 
 **Name**:
-- a string of Latin letters and the symbol `_` and numbers. First character is a Latin letter or the symbol `_`
+- a string of  letters and the symbol `_` and numbers. First character is a Latin letter or the symbol `_`
 
 **End**:
 - `\n`

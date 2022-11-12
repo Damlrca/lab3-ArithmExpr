@@ -21,7 +21,7 @@ ostream& operator<<(ostream& out, const Token& t) {
 		out << t.get_str() << ", name";
 		break;
 	case TokenType::End:
-		out << "NONE, end";
+		out << "END, end";
 		break;
 	default:
 		out << "ERROR";
