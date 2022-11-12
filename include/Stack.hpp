@@ -1,36 +1,64 @@
 #ifndef __CALC_STACK_HPP__
 #define __CALC_STACK_HPP__
 
+#include <memory>
+
 template<class T>
 class Stack {
 private:
 	T *p;
-	int top;
+	std::allocator<T> a;
 	int size;
+	int top;
+
+	bool full() const { return top + 1 >= size; }
+
 public:
-	Stack(int _size) : size{ _size }, top{-1} {
-		if (size <= 0)
-			throw -1;
-		p = new T[size];
-	}
-
-	bool is_empty() { return top == -1; }
-	bool is_full() { return top + 1 >= size; }
-
-	int pop() {
-		if (is_empty())
-			throw -1;
-		return p[top--];
-	}
-
-	void push(int x) {
-		if (is_full())
-			throw -1;
-		p[++top] = x;
+	Stack() : size{ 1 }, top{ -1 }, a{} {
+		p = a.allocate(size);
 	}
 
 	~Stack() {
-		delete[] p;
+		T* last = p + (top + 1);
+		for (T* t = p; t != last; t++)
+			t->~T();
+		a.deallocate(p, size);
+	}
+
+	bool empty() const { return top == -1; }
+
+	T pop() {
+		if (empty())
+			throw -1;
+		T temp{ p[top] };
+		(p+top)->~T();
+		top--;
+		return temp;
+	}
+
+	void push(const T& x) {
+		if (full()) {
+			T* temp = a.allocate(2 * size);
+			
+			/*//requires ñ++17
+			std::uninitialized_move(p, p + size, temp);
+			T* last = p + size;
+			for (T* t = p; t != next; t++)
+				t->~T();
+			*/
+
+			T* last = p + size;
+			for (T* t = p, *u = temp; t != last; t++, u++) {
+				new(u) T(std::move(*t));
+				t->~T();
+			}
+
+			a.deallocate(p, size);
+			p = temp;
+			size *= 2;
+		}
+		top++;
+		new(p + top) T{ x };
 	}
 };
 

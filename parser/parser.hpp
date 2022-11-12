@@ -4,56 +4,64 @@
 #include <iostream>
 #include <vector>
 #include <string>
-
-using namespace std;
+#include "Stack.hpp"
+#include "Queue.hpp"
 
 enum class TokenType {
-	Operator,	// +(binary) -(binary) +(unary) -(unary) * / ( ) =
-	Literal,	// const value
-	Name,		// variable name
-	End		// ; '\n' EOF
+	Un_Operator,	//str: +(unary) -(unary)
+	Bn_Operator,	//str: +(binary) -(binary) * /
+	Sp_Operator,	//str: ( ) =
+	Number,			//val: real value
+	Name,			//str: variable name
+	End				// no: ; '\n' EOF
 };
 
 class Token {
 private:
 	TokenType type;
-	string str;
+	std::string str;
 	double val;
 public:
-	Token(TokenType t, const string& s) : type{ t }, str{ s }, val{} {}
-	Token(TokenType t, double v) : type{ t }, str{}, val{ v } {}
-	string get_str() const { return str; }
+	explicit Token(TokenType t) : type{ t }, str{}, val{} {
+		if (type != TokenType::End)
+			throw -1;
+	}
+	explicit Token(TokenType t, const std::string& s) : type{ t }, str{ s }, val{} {
+		switch (t)
+		{
+		case TokenType::Un_Operator:
+			if (s != "+" && s != "-")
+				throw -1;
+			break;
+		case TokenType::Bn_Operator:
+			if (s != "+" && s != "-" && s != "*" && s != "/")
+				throw -1;
+			break;
+		case TokenType::Sp_Operator:
+			if (s != "(" && s != ")" && s != "=")
+				throw -1;
+			break;
+		case TokenType::Name:
+			//check if is uncorrect?
+			break;
+		default:
+			throw -1;
+			break;
+		}
+	}
+	explicit Token(TokenType t, double v) : type{ t }, str{}, val{ v } {
+		if (type != TokenType::Number)
+			throw -1;
+	}
+	std::string get_str() const { return str; }
 	TokenType get_type() const { return type; }
 	double get_val() const { return val; }
 };
 
-ostream& operator<<(ostream& out, const Token& t) {
-	out << "{";
-	switch (t.get_type())
-	{
-	case TokenType::Operator:
-		out << t.get_str() << ", operator";
-		break;
-	case TokenType::Literal:
-		out << t.get_val() << ", literal";
-	case TokenType::Name:
-		out << t.get_str() << ", name";
-		break;
-	case TokenType::End:
-		out << "NONE, end";
-		break;
-	default:
-		out << "ERROR";
-		break;
-	}
-	out << "}";
-	return out;
-}
+std::ostream& operator<<(std::ostream& out, const Token& t);
 
-vector<Token> lex(string input) {
-	vector<Token> res;
+std::vector<Token> lex(std::string);
 
-	return res;
-}
+std::vector<Token> parse(std::vector<Token>);
 
 #endif // !__CALC_PARSER_HPP__
