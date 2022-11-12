@@ -4,9 +4,7 @@ using namespace std;
 
 int main() {
 	cout << "Hello world" << endl;
-	A<int> a(10);
-	cout << a.get() << endl;
-	for (int i = 0; i < 10; i++)
-		cout << a.pop() << " ";
+	Token t{ TokenType::Name, "test_name" };
+	cout << t;
 	return 0;
 }

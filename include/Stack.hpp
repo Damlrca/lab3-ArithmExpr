@@ -1,5 +1,5 @@
-#ifndef __STACK_HPP__
-#define __STACK_HPP__
+#ifndef __CALC_STACK_HPP__
+#define __CALC_STACK_HPP__
 
 template<class T>
 class Stack {
@@ -34,4 +34,4 @@ public:
 	}
 };
 
-#endif // !__STACK_HPP__
+#endif // !__CALC_STACK_HPP__
