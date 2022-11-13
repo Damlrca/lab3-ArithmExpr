@@ -17,6 +17,7 @@ ostream& operator<<(ostream& out, const Token& t) {
 		break;
 	case TokenType::Number:
 		out << t.get_val() << ", number";
+		break;
 	case TokenType::Name:
 		out << t.get_str() << ", name";
 		break;
@@ -24,20 +25,20 @@ ostream& operator<<(ostream& out, const Token& t) {
 		out << "END, end";
 		break;
 	default:
-		out << "ERROR";
+		out << "INCORRECT TOKEN";
 		break;
 	}
 	out << "}";
 	return out;
 }
 
-vector<Token> lex(string input) {
+vector<Token> lex(const string& input) {
 	vector<Token> res;
 
 	return res;
 }
 
-vector<Token> parse(vector<Token> input) {
+vector<Token> parse(const vector<Token>& input) {
 	vector<Token> res;
 
 	return res;

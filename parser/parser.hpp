@@ -42,7 +42,7 @@ public:
 				throw -1;
 			break;
 		case TokenType::Name:
-			//check if is uncorrect?
+			//check if is incorrect?
 			break;
 		default:
 			throw -1;
@@ -60,8 +60,8 @@ public:
 
 std::ostream& operator<<(std::ostream& out, const Token& t);
 
-std::vector<Token> lex(std::string);
+std::vector<Token> lex(const std::string&);
 
-std::vector<Token> parse(std::vector<Token>);
+std::vector<Token> parse(const std::vector<Token>&);
 
 #endif // !__CALC_PARSER_HPP__

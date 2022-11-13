@@ -12,9 +12,9 @@ private:
 	int start;
 	int end;
 
-	int next(int x) { return (x + 1) % size; }
+	int next(int x) const { return (x + 1) % size; }
 
-	bool full() { return next(next(end)) == start; }
+	bool full() const { return next(next(end)) == start; }
 
 	void double_size() {
 		T* temp = a.allocate(2 * size);
@@ -46,7 +46,7 @@ public:
 		a.deallocate(p, size);
 	}
 
-	bool empty() { return next(end) == start; }
+	bool empty() const { return next(end) == start; }
 
 	T pop() {
 		if (empty())
