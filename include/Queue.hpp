@@ -60,15 +60,15 @@ public:
 	void push(const T& x) {
 		if (full())
 			double_size();
+		new(p + next(end)) T{ x };
 		end = next(end);
-		new(p + end) T{ x };
 	}
 
 	void push(T&& x) {
 		if (full())
 			double_size();
+		new(p + next(end)) T{ x };
 		end = next(end);
-		new(p + end) T{ x };
 	}
 
 };

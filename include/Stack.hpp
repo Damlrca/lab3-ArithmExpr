@@ -16,7 +16,7 @@ private:
 	void double_size() {
 		T* temp = a.allocate(2 * size);
 
-		/*//requires ñ++17
+		/*//requires c++17
 		std::uninitialized_move(p, p + size, temp);
 		T* last = p + size;
 		for (T* t = p; t != next; t++)
@@ -60,15 +60,15 @@ public:
 	void push(const T& x) {
 		if (full())
 			double_size();
+		new(p + (top + 1)) T{ x };
 		top++;
-		new(p + top) T{ x };
 	}
 
 	void push(T&& x) {
 		if (full())
 			double_size();
+		new(p + (top + 1)) T{ x };
 		top++;
-		new(p + top) T{ x };
 	}
 
 };
