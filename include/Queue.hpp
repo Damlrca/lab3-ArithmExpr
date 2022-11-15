@@ -19,9 +19,16 @@ private:
 
 		int last = next(end);
 		int t = start, u = 0;
-		for (; t != last; t = next(t), u = next(u)) {
-			new(temp.p + u) T{ std::move(m.p[t]) };
-			(m.p + t)->~T();
+		try {
+			for (; t != last; t = next(t), ++u) {
+				new(temp.p + u) T{ std::move(m.p[t]) };
+				(m.p + t)->~T();
+			}
+		}
+		catch (...) {
+			for (int x = 0; x != u; ++x)
+				(temp.p + x)->~T();
+			throw;
 		}
 		
 		start = 0;

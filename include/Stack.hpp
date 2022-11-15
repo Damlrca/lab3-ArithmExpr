@@ -17,9 +17,16 @@ private:
 		T* t = m.p;
 		T* u = temp.p;
 		T* last = t + (top + 1);
-		for (; t != last; t++, u++) {
-			new(static_cast<void*>(u)) T(std::move(*t));
-			t->~T();
+		try {
+			for (; t != last; ++t, ++u) {
+				new(static_cast<void*>(u)) T(std::move(*t));
+				t->~T();
+			}
+		}
+		catch (...) {
+			for (T* x = temp.p; x != u; ++x)
+				x->~T();
+			throw;
 		}
 
 		swap(m, temp);
@@ -30,7 +37,7 @@ public:
 
 	~Stack() {
 		T* last = m.p + (top + 1);
-		for (T* t = m.p; t != last; t++)
+		for (T* t = m.p; t != last; ++t)
 			t->~T();
 	}
 
