@@ -1,49 +1,37 @@
 #ifndef __CALC_STACK_HPP__
 #define __CALC_STACK_HPP__
 
-#include <memory>
+#include "uninit_mem.hpp"
 
 template<class T>
 class Stack {
 private:
-	T *p;
-	std::allocator<T> a;
-	int size;
+	uninit_mem<T> m;
 	int top;
 
-	bool full() const { return top + 1 >= size; }
+	bool full() const { return top + 1 >= m.size; }
 
 	void double_size() {
-		T* temp = a.allocate(2 * size);
+		uninit_mem<T> temp{ 2 * m.size };
 
-		/*//requires c++17
-		std::uninitialized_move(p, p + size, temp);
-		T* last = p + size;
-		for (T* t = p; t != next; t++)
-			t->~T();
-		*/
-
-		T* last = p + (top + 1);
-		for (T* t = p, *u = temp; t != last; t++, u++) {
-			new(u) T(std::move(*t));
+		T* t = m.p;
+		T* u = temp.p;
+		T* last = t + (top + 1);
+		for (; t != last; t++, u++) {
+			new(static_cast<void*>(u)) T(std::move(*t));
 			t->~T();
 		}
 
-		a.deallocate(p, size);
-		p = temp;
-		size *= 2;
+		swap(m, temp);
 	}
 
 public:
-	Stack() : size{ 1 }, top{ -1 }, a{} {
-		p = a.allocate(size);
-	}
+	Stack() : m{ 1 }, top{ -1 } {}
 
 	~Stack() {
-		T* last = p + (top + 1);
-		for (T *t = p; t != last; t++)
+		T* last = m.p + (top + 1);
+		for (T* t = m.p; t != last; t++)
 			t->~T();
-		a.deallocate(p, size);
 	}
 
 	bool empty() const { return top == -1; }
@@ -51,23 +39,21 @@ public:
 	T pop() {
 		if (empty())
 			throw -1;
-		T temp{ std::move(p[top]) };
-		(p + top)->~T();
+		T temp{ std::move(m.p[top]) };
+		(m.p + top)->~T();
 		top--;
 		return temp;
 	}
 
 	void push(const T& x) {
-		if (full())
-			double_size();
-		new(p + (top + 1)) T{ x };
+		if (full()) double_size();
+		new(static_cast<void*>(m.p + (top + 1))) T{ x };
 		top++;
 	}
 
 	void push(T&& x) {
-		if (full())
-			double_size();
-		new(p + (top + 1)) T{ x };
+		if (full()) double_size();
+		new(static_cast<void*>(m.p + (top + 1))) T{ x };
 		top++;
 	}
 
