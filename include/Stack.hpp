@@ -8,22 +8,22 @@ template<class T>
 class Stack {
 private:
 	uninit_mem<T> m;
-	int top;
+	int _top;
 
 	void destroy_elements() {
-		T* last = m.ptr() + (top + 1);
+		T* last = m.ptr() + (_top + 1);
 		for (T* t = m.ptr(); t != last; ++t)
 			t->~T();
 	}
 
-	bool full() const { return top + 1 >= m.size(); }
+	bool full() const { return _top + 1 >= m.size(); }
 
 	void double_size() {
 		uninit_mem<T> temp{ 2 * m.size() };
 
 		T* t = m.ptr();
 		T* u = temp.ptr();
-		T* last = t + (top + 1);
+		T* last = t + (_top + 1);
 		try {
 			for (; t != last; ++t, ++u)
 				new(static_cast<void*>(u)) T{ std::move(*t) };
@@ -40,31 +40,37 @@ private:
 	}
 
 public:
-	Stack() : m{ 1 }, top{ -1 } {}
+	Stack() : m{ 1 }, _top{ -1 } {}
 	
 	~Stack() { destroy_elements(); }
 
-	bool empty() const { return top == -1; }
+	bool empty() const { return _top == -1; }
+
+	T& top() {
+		if (empty())
+			throw - 1;
+		return m.ptr()[_top];
+	}
 
 	T pop() {
 		if (empty())
 			throw -1;
-		T temp{ std::move(m.ptr()[top]) };
-		(m.ptr() + top)->~T();
-		top--;
+		T temp{ std::move(m.ptr()[_top]) };
+		(m.ptr() + _top)->~T();
+		_top--;
 		return temp;
 	}
 
 	void push(const T& x) {
 		if (full()) double_size();
-		new(static_cast<void*>(m.ptr() + (top + 1))) T{ x };
-		top++;
+		new(static_cast<void*>(m.ptr() + (_top + 1))) T{ x };
+		_top++;
 	}
 
 	void push(T&& x) {
 		if (full()) double_size();
-		new(static_cast<void*>(m.ptr() + (top + 1))) T{ x };
-		top++;
+		new(static_cast<void*>(m.ptr() + (_top + 1))) T{ x };
+		_top++;
 	}
 
 };

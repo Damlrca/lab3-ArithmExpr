@@ -58,9 +58,11 @@ public:
 	double get_val() const { return val; }
 };
 
+bool operator>=(const Token& l, const Token& r);
+
 std::ostream& operator<<(std::ostream& out, const Token& t);
 
-std::vector<Token> lex(const std::string&);
+std::vector<Token> lex(std::string input);
 
 std::vector<Token> parse(const std::vector<Token>&);
 
