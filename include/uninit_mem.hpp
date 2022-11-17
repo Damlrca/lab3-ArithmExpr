@@ -1,22 +1,31 @@
 #ifndef __CALC_UNINIT_MEM_HPP__
 #define __CALC_UNINIT_MEM_HPP__
 
-#include <memory>
+#include <utility>
 
 template<class T>
-struct uninit_mem {
-	std::allocator<T> a;
+class uninit_mem {
+private:
+	int sz;
 	T* p;
-	int size;
-	uninit_mem(int sz) : a{}, p{ a.allocate(sz) }, size{ sz } {}
+public:
+	uninit_mem(int _sz) : sz{ _sz }, p{ static_cast<T*>(::operator new(sizeof(T) * sz)) } {}
+	~uninit_mem() { ::operator delete(static_cast<void*>(p)); }
+	T* ptr() const { return p; }
+	int size() const { return sz; }
 	uninit_mem(const uninit_mem&) = delete;
 	uninit_mem& operator=(const uninit_mem&) = delete;
-	uninit_mem(uninit_mem&&) = delete;
-	uninit_mem& operator=(uninit_mem&&) = delete;
-	~uninit_mem() { a.deallocate(p, size); }
+	uninit_mem(uninit_mem&& x) : sz{ x.sz }, p{ x.p } {
+		x.sz = 0;
+		x.p = nullptr;
+	}
+	uninit_mem& operator=(uninit_mem&& x) {
+		swap(*this, x);
+		return *this;
+	};
 	friend void swap(uninit_mem<T>& x, uninit_mem<T>& y) {
 		std::swap(x.p, y.p);
-		std::swap(x.size, y.size);
+		std::swap(x.sz, y.sz);
 	}
 };
 
