@@ -27,9 +27,8 @@ private:
 		int last = next(end);
 		int t = start, u = 0;
 		try {
-			for (; t != last; t = next(t), ++u) {
+			for (; t != last; t = next(t), ++u)
 				new(temp.ptr() + u) T{ std::move(m.ptr()[t]) };
-			}
 		}
 		catch (...) {
 			for (int x = 0; x != u; ++x)
@@ -38,9 +37,10 @@ private:
 		}
 		
 		destroy_elements();
+
+		m = std::move(temp);
 		start = 0;
 		end = u - 1;
-		m = std::move(temp);
 	}
 
 public:

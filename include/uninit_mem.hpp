@@ -22,7 +22,7 @@ public:
 	uninit_mem& operator=(uninit_mem&& x) {
 		swap(*this, x);
 		return *this;
-	};
+	}
 	friend void swap(uninit_mem<T>& x, uninit_mem<T>& y) {
 		std::swap(x.p, y.p);
 		std::swap(x.sz, y.sz);

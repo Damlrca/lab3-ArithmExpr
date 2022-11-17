@@ -5,10 +5,11 @@
 #include "Stack.hpp"
 
 TEST(test_Stack, first_test) {
+	constexpr int N = 100000;
 	Stack<int> s;
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < N; i++)
 		s.push(i);
-	for (int i = 9; i >= 0; i--)
+	for (int i = N - 1; i >= 0; i--)
 		EXPECT_EQ(i, s.pop());
 }
 

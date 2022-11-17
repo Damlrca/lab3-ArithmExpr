@@ -25,9 +25,8 @@ private:
 		T* u = temp.ptr();
 		T* last = t + (top + 1);
 		try {
-			for (; t != last; ++t, ++u) {
-				new(static_cast<void*>(u)) T(std::move(*t));
-			}
+			for (; t != last; ++t, ++u)
+				new(static_cast<void*>(u)) T{ std::move(*t) };
 		}
 		catch (...) {
 			for (T* x = temp.ptr(); x != u; ++x)
@@ -36,12 +35,13 @@ private:
 		}
 
 		destroy_elements();
+
 		m = std::move(temp);
 	}
 
 public:
 	Stack() : m{ 1 }, top{ -1 } {}
-
+	
 	~Stack() { destroy_elements(); }
 
 	bool empty() const { return top == -1; }
