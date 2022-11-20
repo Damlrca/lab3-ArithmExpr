@@ -55,6 +55,92 @@ vector<Token> lex(string input) {
 	string tmp;
 	int in_numb = 0;
 
+	int size = input.size();
+
+	for (int i = 0; i < size;) {
+		switch (input[i])
+		{
+		case ' ': case '\t':
+			i++;
+			break;
+		case ';': case '\n':
+			res.push_back(Token{ TokenType::End });
+			i++;
+			break;
+		case '+': case '-':
+			if (input[i] == '+' || input[i] == '-') {
+				if (res.empty() || (res.back().get_type() != TokenType::Name && res.back().get_type() != TokenType::Number && res.back().get_str() != ")"))
+					res.push_back(Token{ TokenType::Un_Operator, string{input[i]} });
+				else
+					res.push_back(Token{ TokenType::Bn_Operator, string{input[i]} });
+			}
+			i++;
+			break;
+		case '*': case '/':
+			res.push_back(Token{ TokenType::Bn_Operator, string{input[i]} });
+			i++;
+			break;
+		case '(': case ')': case '=':
+			res.push_back(Token{ TokenType::Sp_Operator, string{input[i]} });
+			i++;
+			break;
+		default:
+		{
+			string temp;
+			if ((input[i] >= '0' && input[i] <= '9') || input[i] == '.') {
+				// 111.222e-333
+				while (i < size && input[i] >= '0' && input[i] <= '9') {
+					temp.push_back(input[i]);
+					i++;
+				}
+				if (i < size && input[i] == '.') {
+					temp.push_back(input[i]);
+					i++;
+				}
+				while (i < size && input[i] >= '0' && input[i] <= '9') {
+					temp.push_back(input[i]);
+					i++;
+				}
+				if (i < size && (input[i] == 'e' || input[i] == 'E')) {
+					temp.push_back(input[i]);
+					i++;
+				}
+				if (i < size && input[i] == '-') {
+					temp.push_back(input[i]);
+					i++;
+				}
+				while (i < size && input[i] >= '0' && input[i] <= '9') {
+					temp.push_back(input[i]);
+					i++;
+				}
+				try {
+					res.push_back(Token{ TokenType::Number, stod(temp) });
+				}
+				catch (...) {
+					throw exception{ "wrong real number format" };
+				}
+			}
+			else if (input[i] == '_' || (input[i] >= 'A' && input[i] <= 'Z') || (input[i] >= 'a' && input[i] <= 'z')) {
+				while (i < size) {
+					if (input[i] == '_' || (input[i] >= 'A' && input[i] <= 'Z') || (input[i] >= 'a' && input[i] <= 'z')) {
+						temp.push_back(input[i]);
+					}
+					else {
+						break;
+					}
+					i++;
+				}
+				res.push_back(Token{ TokenType::Name, temp });
+			}
+			else {
+				throw exception{ "unknown symbol" };
+			}
+		}
+			break;
+		}
+	}
+
+	/*
 	for (char c : input) {
 		switch (c) {
 		case ' ':
@@ -97,7 +183,7 @@ vector<Token> lex(string input) {
 			break;
 		}
 	}
-
+	*/
 	return res;
 }
 

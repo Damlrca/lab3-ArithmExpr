@@ -19,7 +19,7 @@ public:
 		x.sz = 0;
 		x.p = nullptr;
 	}
-	uninit_mem& operator=(uninit_mem&& x) {
+	uninit_mem& operator=(uninit_mem&& x) noexcept {
 		swap(*this, x);
 		return *this;
 	}

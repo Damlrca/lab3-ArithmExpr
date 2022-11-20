@@ -6,12 +6,12 @@
 - `calc Expr-list`
 - `exit`
 
-
 ## Arithmetic Expression syntax:
 
 ### Expression
 
 **Expr-list**:
+- `Expr`
 - `Expr End`
 - `Expr End Expr-list`
 
@@ -23,12 +23,11 @@
 - `( Expr )`
 - `Name = Expr`
 
-
 ### Token types
 
-**Operators**:
-- \<binary\>: `+ - * /`
+**Operators** (sorted by priority):
 - \<unary\>: `+ -`
+- \<binary\>: `* / + -`
 - \<special\>: `( ) =`
 
 **Number**:
@@ -40,7 +39,6 @@
 **End**:
 - `\n`
 - `;`
-- `EOF`
 
 ## parser lib functions
 
