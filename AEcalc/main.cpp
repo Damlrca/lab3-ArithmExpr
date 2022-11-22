@@ -8,14 +8,16 @@
 using namespace std;
 
 int main() {
-	string s{ "(12 + 13) / -23 * (3 + 2)" };
+	string s{ "(12e-1 + 13.25e1) -.23e2 * (3 + 2)" };
+	//string s{ "(10*(-25)+13.53 - (-0.12))*32 + 32/0.5" };
+	//string s{ ";-24" };
 	cout << "input: \"" << s << "\"" << endl;
 	//auto t = get_ArithmExpr_vector(s);
 	cout << "infix:" << endl;
 	auto t1 = lex(s);
 	for (auto o : t1)
 		cout << o << endl;
-	cout << "postfix:" << endl;
+	/*cout << "postfix:" << endl;
 	auto t2 = parse(t1);
 	for (auto o : t2)
 		cout << o << endl;
@@ -56,6 +58,6 @@ int main() {
 			break;
 		}
 	}
-	cout << st.pop() << endl;
+	cout << st.pop() << endl;*/
 	return 0;
 }

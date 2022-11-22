@@ -50,12 +50,8 @@ ostream& operator<<(ostream& out, const Token& t) {
 vector<Token> lex(string input) {
 	vector<Token> res;
 
-	input += " ";
-
-	string tmp;
-	int in_numb = 0;
-
 	int size = input.size();
+	string tmp;
 
 	for (int i = 0; i < size;) {
 		switch (input[i])
@@ -67,21 +63,24 @@ vector<Token> lex(string input) {
 			res.push_back(Token{ TokenType::End });
 			i++;
 			break;
-		case '+': case '-':
-			if (input[i] == '+' || input[i] == '-') {
-				if (res.empty() || (res.back().get_type() != TokenType::Name && res.back().get_type() != TokenType::Number && res.back().get_str() != ")"))
-					res.push_back(Token{ TokenType::Un_Operator, string{input[i]} });
-				else
-					res.push_back(Token{ TokenType::Bn_Operator, string{input[i]} });
-			}
-			i++;
-			break;
 		case '*': case '/':
 			res.push_back(Token{ TokenType::Bn_Operator, string{input[i]} });
 			i++;
 			break;
 		case '(': case ')': case '=':
 			res.push_back(Token{ TokenType::Sp_Operator, string{input[i]} });
+			i++;
+			break;
+		case '+': case '-':
+			if (input[i] == '+' || input[i] == '-') {
+				if (!res.empty() && (
+					res.back().get_type() == TokenType::Name ||
+					res.back().get_type() == TokenType::Number ||
+					res.back().get_str() == ")" ))
+					res.push_back(Token{ TokenType::Bn_Operator, string{input[i]} });
+				else
+					res.push_back(Token{ TokenType::Un_Operator, string{input[i]} });
+			}
 			i++;
 			break;
 		default:
@@ -104,30 +103,31 @@ vector<Token> lex(string input) {
 				if (i < size && (input[i] == 'e' || input[i] == 'E')) {
 					temp.push_back(input[i]);
 					i++;
+					if (i < size && input[i] == '-') {
+						temp.push_back(input[i]);
+						i++;
+					}
+					while (i < size && input[i] >= '0' && input[i] <= '9') {
+						temp.push_back(input[i]);
+						i++;
+					}
 				}
-				if (i < size && input[i] == '-') {
-					temp.push_back(input[i]);
-					i++;
-				}
-				while (i < size && input[i] >= '0' && input[i] <= '9') {
-					temp.push_back(input[i]);
-					i++;
-				}
-				try {
+				try { // can stod throw?
 					res.push_back(Token{ TokenType::Number, stod(temp) });
 				}
 				catch (...) {
 					throw exception{ "wrong real number format" };
 				}
 			}
-			else if (input[i] == '_' || (input[i] >= 'A' && input[i] <= 'Z') || (input[i] >= 'a' && input[i] <= 'z')) {
-				while (i < size) {
-					if (input[i] == '_' || (input[i] >= 'A' && input[i] <= 'Z') || (input[i] >= 'a' && input[i] <= 'z')) {
-						temp.push_back(input[i]);
-					}
-					else {
-						break;
-					}
+			else if ( input[i] == '_' ||
+				(input[i] >= 'A' && input[i] <= 'Z') ||
+				(input[i] >= 'a' && input[i] <= 'z') ) {
+				while (i < size && 
+					( input[i] == '_' ||
+					(input[i] >= 'A' && input[i] <= 'Z') ||
+					(input[i] >= 'a' && input[i] <= 'z') ||
+					(input[i] >= '0' && input[i] <= '9') ) ) {
+					temp.push_back(input[i]);
 					i++;
 				}
 				res.push_back(Token{ TokenType::Name, temp });
@@ -140,50 +140,6 @@ vector<Token> lex(string input) {
 		}
 	}
 
-	/*
-	for (char c : input) {
-		switch (c) {
-		case ' ':
-			if (in_numb) {
-				res.push_back(Token{TokenType::Number, stod(tmp)});
-				in_numb = 0;
-				tmp.clear();
-			}
-			break;
-		case '+': case '-': case '*': case '/':
-			if (in_numb) {
-				res.push_back(Token{ TokenType::Number, stod(tmp) });
-				in_numb = 0;
-				tmp.clear();
-			}
-			if ((c == '+' || c == '-') && (res.size() == 0 || res.back().get_type() != TokenType::Number)) {
-				res.push_back(Token{ TokenType::Un_Operator, string{c} });
-			}
-			else {
-				res.push_back(Token{ TokenType::Bn_Operator, string{c} });
-			}
-			break;
-		case '(': case ')':
-			if (in_numb) {
-				res.push_back(Token{ TokenType::Number, stod(tmp) });
-				in_numb = 0;
-				tmp.clear();
-			}
-			res.push_back(Token{ TokenType::Sp_Operator, string{c} });
-			break;
-		default:
-			if (c >= '0' && c <= '9') {
-				tmp += c;
-				in_numb = 1;
-			}
-			else {
-				// error
-				break;
-			}
-			break;
-		}
-	}
-	*/
 	return res;
 }
 
