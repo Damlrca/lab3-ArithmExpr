@@ -40,19 +40,20 @@
 - `\n`
 - `;`
 
-## parser lib functions
+## parser library functions
 
-- lex: `string -> vector<Token>`
-- parse: `vector<Token> -> vector<Token> (RPN: Reverse Polish notation)`
+- lex: `string (infix) -> vector<Token> (infix)`
+- parse: `vector<Token> (infix) -> vector<Token> (postfix)`
 
 ## ArithmExpr class
 
 private:
-- constructor `ArithmExpr(vector<Token>, vector<Token> (RPN) )`
+- constructor `ArithmExpr(vector<Token> (infix), vector<Token> (postfix) )`
 
 public:
 - print
-- print_RPN
+- print_postix
+- calculate
 
 friend:
-- get_ArithmExpr_vector: `string -> vector<ArithmExpr>`
+- get_ArithmExpr_vector: `string (infix) -> vector<ArithmExpr>`

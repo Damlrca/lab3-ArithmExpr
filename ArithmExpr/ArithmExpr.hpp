@@ -19,7 +19,7 @@ private:
 	ArithmExpr(std::vector<Token>&& _infix, std::vector<Token>&& _postfix) : infix{ _infix }, postfix{ _postfix } {}
 public:
 	void print(std::ostream& = std::cout);
-	void print_RPN(std::ostream& = std::cout); // Reverse Polish notation
+	void print_postfix(std::ostream& = std::cout);
 	double calculate();
 	friend std::vector<ArithmExpr> get_ArithmExpr_vector(const std::string&);
 };

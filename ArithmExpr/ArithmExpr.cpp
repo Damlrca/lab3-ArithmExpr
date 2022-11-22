@@ -8,7 +8,7 @@ void ArithmExpr::print(ostream& out) {
 
 }
 
-void ArithmExpr::print_RPN(ostream& out) {
+void ArithmExpr::print_postfix(ostream& out) {
 	
 }
 
