@@ -42,13 +42,13 @@
 
 ## parser library functions
 
-- lex: `string (infix) -> vector<Token> (infix)`
-- parse: `vector<Token> (infix) -> vector<Token> (postfix)`
+- lex: `string (infix, Expr-list) -> vector<Token> (infix, Expr-list)`
+- parse: `vector<Token> (infix, Expr) -> vector<Token> (postfix, Expr)`
 
 ## ArithmExpr class
 
 private:
-- constructor `ArithmExpr(vector<Token> (infix), vector<Token> (postfix) )`
+- constructor `ArithmExpr(vector<Token> (infix, Expr), vector<Token> (postfix, Expr) )`
 
 public:
 - print
@@ -56,4 +56,4 @@ public:
 - calculate
 
 friend:
-- get_ArithmExpr_vector: `string (infix) -> vector<ArithmExpr>`
+- get_ArithmExpr_vector: `string (infix, Expr-list) -> vector<ArithmExpr>`

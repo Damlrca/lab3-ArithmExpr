@@ -5,6 +5,10 @@
 using namespace std;
 
 bool operator>=(const Token& l, const Token& r) {
+	// un+ un-
+	// * /
+	// bn+ bn-
+	// ( ) = ???
 	if (l.get_type() == TokenType::Sp_Operator)
 		return false;
 	if (l.get_type() == TokenType::Un_Operator)
@@ -51,7 +55,6 @@ vector<Token> lex(string input) {
 	vector<Token> res;
 
 	int size = input.size();
-	string tmp;
 
 	for (int i = 0; i < size;) {
 		switch (input[i])
@@ -146,9 +149,36 @@ vector<Token> lex(string input) {
 vector<Token> parse(const vector<Token>& input) {
 	vector<Token> res;
 
+	int size = input.size();
 	Stack<Token> s;
 
-	for (auto o : input) {
+	for (int i = 0; i < size; i++) {
+		switch (input[i].get_type())
+		{
+		case TokenType::Number: case TokenType::Name:
+			res.push_back(input[i]);
+			break;
+		case TokenType::Un_Operator:
+		case TokenType::Bn_Operator:
+			while (!s.empty() && s.top() >= input[i])
+				res.push_back(s.pop());
+			s.push(input[i]);
+			break;
+		case TokenType::Sp_Operator:
+			//???
+			break;
+		case TokenType::End:
+			//???
+			break;
+		default:
+			break;
+		}
+	}
+
+	while (!s.empty())
+		res.push_back(s.pop());
+
+	/*for (auto o : input) {
 		switch (o.get_type())
 		{
 		case TokenType::Number:
@@ -176,9 +206,7 @@ vector<Token> parse(const vector<Token>& input) {
 			break;
 		}
 	}
-
-	while (!s.empty())
-		res.push_back(s.pop());
+	*/
 
 	return res;
 }

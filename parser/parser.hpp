@@ -13,7 +13,7 @@ enum class TokenType {
 	Sp_Operator,  //str: ( ) =
 	Number,       //val: real value
 	Name,         //str: variable name
-	End           // no: ; '\n' EOF
+	End           // no: ; '\n'
 };
 
 class Token {
