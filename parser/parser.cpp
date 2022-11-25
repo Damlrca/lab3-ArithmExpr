@@ -181,7 +181,11 @@ vector<Token> parse(const vector<Token>& input) {
 				}
 			}
 			else if (input[i].get_str() == "=") {
-				//???
+				while (!s.empty() && s.top().get_str() != "(" && s.top().get_str() != "=") {
+					res.push_back(s.pop());
+				}
+				s.push(input[i]);
+				// throws when what ???
 			}
 			break;
 		case TokenType::End:
@@ -199,35 +203,35 @@ vector<Token> parse(const vector<Token>& input) {
 		res.push_back(s.pop());
 	}
 
-	int cnt = 0;
-	for (const auto &o : res) {
-		switch (o.get_type())
-		{
-		case TokenType::Number:
-		case TokenType::Name:
-			cnt++;
-			break;
-		case TokenType::Un_Operator:
-			if (cnt < 1)
-				throw -1;
-			break;
-		case TokenType::Bn_Operator:
-			if (cnt < 2)
-				throw -1;
-			cnt--;
-			break;
-		case TokenType::Sp_Operator:
-			
-			break;
-		case TokenType::End:
-			//???
-			break;
-		default:
-			break;
-		}
-	}
-	if (cnt != 1)
-		throw -1;
+	//int cnt = 0;
+	//for (const auto &o : res) {
+	//	switch (o.get_type())
+	//	{
+	//	case TokenType::Number:
+	//	case TokenType::Name:
+	//		cnt++;
+	//		break;
+	//	case TokenType::Un_Operator:
+	//		if (cnt < 1)
+	//			throw -1;
+	//		break;
+	//	case TokenType::Bn_Operator:
+	//		if (cnt < 2)
+	//			throw -1;
+	//		cnt--;
+	//		break;
+	//	case TokenType::Sp_Operator:
+	//		
+	//		break;
+	//	case TokenType::End:
+	//		//???
+	//		break;
+	//	default:
+	//		break;
+	//	}
+	//}
+	//if (cnt != 1)
+	//	throw -1;
 
 	return res;
 }
