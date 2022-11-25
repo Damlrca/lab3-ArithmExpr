@@ -4,20 +4,28 @@ using namespace std;
 
 map<string, double> table;
 
-void ArithmExpr::print(ostream& out) {
-	string res;
+void ArithmExpr::print(ostream& out, const vector<Token>& v) const {
+	bool not_empty = 0;
 	stringstream ss;
-	for (const auto& o : infix) {
+	for (const auto& o : v) {
 		switch (o.get_type())
 		{
 		case TokenType::Number:
-			ss << o.get_val() << " ";
+			if (not_empty)
+				ss << " ";
+			else
+				not_empty = true;
+			ss << o.get_val();
 			break;
 		case TokenType::Name:
 		case TokenType::Un_Operator:
 		case TokenType::Bn_Operator:
 		case TokenType::Sp_Operator:
-			ss << o.get_str() << " ";
+			if (not_empty)
+				ss << " ";
+			else
+				not_empty = true;
+			ss << o.get_str();
 			break;
 		case TokenType::End:
 			break;
@@ -25,35 +33,15 @@ void ArithmExpr::print(ostream& out) {
 			break;
 		}
 	}
-	res = ss.str();
-	if (!res.empty()) res.pop_back();
-	out << res;
+	out << ss.str();
 }
 
-void ArithmExpr::print_postfix(ostream& out) {
-	string res;
-	stringstream ss;
-	for (const auto& o : postfix) {
-		switch (o.get_type())
-		{
-		case TokenType::Number:
-			ss << o.get_val() << " ";
-			break;
-		case TokenType::Name:
-		case TokenType::Un_Operator:
-		case TokenType::Bn_Operator:
-		case TokenType::Sp_Operator:
-			ss << o.get_str() << " ";
-			break;
-		case TokenType::End:
-			break;
-		default:
-			break;
-		}
-	}
-	res = ss.str();
-	if (!res.empty()) res.pop_back();
-	out << res;
+void ArithmExpr::print_infix(ostream& out) const {
+	print(out, infix);
+}
+
+void ArithmExpr::print_postfix(ostream& out) const {
+	print(out, postfix);
 }
 
 double ArithmExpr::calculate() {

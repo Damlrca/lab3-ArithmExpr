@@ -24,12 +24,12 @@ int main() {
 	
 	cout << "\nArithmExpr:\n" << endl;
 	ArithmExpr a{ t1, t2 };
-	cout << "infix: \"";
-	a.print(cout);
-	cout << "\"\n";
-	cout << "postfix: \"";
-	a.print_postfix(cout);
-	cout << "\"\n";
+	cout << "infix: \" ";
+	a.print_infix();
+	cout << " \"\n";
+	cout << "postfix: \" ";
+	a.print_postfix();
+	cout << " \"\n";
 	cout << "result: ";
 	cout << a.calculate() << "\n";
 	return 0;

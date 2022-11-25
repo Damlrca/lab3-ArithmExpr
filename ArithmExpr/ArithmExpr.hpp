@@ -16,11 +16,12 @@ class ArithmExpr {
 private:
 	std::vector<Token> infix;
 	std::vector<Token> postfix;
+	void print(std::ostream&, const std::vector<Token>&) const;
 public:
 	ArithmExpr(const std::vector<Token>& _infix, const std::vector<Token>& _postfix) : infix{ _infix }, postfix{ _postfix } {}
 	ArithmExpr(std::vector<Token>&& _infix, std::vector<Token>&& _postfix) : infix{ _infix }, postfix{ _postfix } {}
-	void print(std::ostream& = std::cout);
-	void print_postfix(std::ostream& = std::cout);
+	void print_infix(std::ostream& = std::cout) const;
+	void print_postfix(std::ostream& = std::cout) const;
 	double calculate();
 	//friend std::vector<ArithmExpr> get_ArithmExpr_vector(const std::string&);
 };
