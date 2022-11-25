@@ -155,7 +155,8 @@ vector<Token> parse(const vector<Token>& input) {
 	for (int i = 0; i < size; i++) {
 		switch (input[i].get_type())
 		{
-		case TokenType::Number: case TokenType::Name:
+		case TokenType::Number:
+		case TokenType::Name:
 			res.push_back(input[i]);
 			break;
 		case TokenType::Un_Operator:
@@ -165,7 +166,23 @@ vector<Token> parse(const vector<Token>& input) {
 			s.push(input[i]);
 			break;
 		case TokenType::Sp_Operator:
-			//???
+			if (input[i].get_str() == "(") {
+				s.push(input[i]);
+			}
+			else if (input[i].get_str() == ")") {
+				while (!s.empty() && s.top().get_str() != "(") {
+					res.push_back(s.pop());
+				}
+				if (!s.empty() && s.top().get_str() == "(") {
+					s.pop();
+				}
+				else {
+					throw exception{ "missing \"(\" operator" };
+				}
+			}
+			else if (input[i].get_str() == "=") {
+				//???
+			}
 			break;
 		case TokenType::End:
 			//???
@@ -175,38 +192,42 @@ vector<Token> parse(const vector<Token>& input) {
 		}
 	}
 
-	while (!s.empty())
+	while (!s.empty()) {
+		if (s.top().get_str() == "(") {
+			throw exception{ "missing \")\" operator" };
+		}
 		res.push_back(s.pop());
+	}
 
-	/*for (auto o : input) {
+	int cnt = 0;
+	for (const auto &o : res) {
 		switch (o.get_type())
 		{
 		case TokenType::Number:
-			res.push_back(o);
+		case TokenType::Name:
+			cnt++;
+			break;
+		case TokenType::Un_Operator:
+			if (cnt < 1)
+				throw -1;
 			break;
 		case TokenType::Bn_Operator:
-		case TokenType::Un_Operator:
-			while (!s.empty() && s.top() >= o) {
-				res.push_back(s.pop());
-			}
-			s.push(o);
+			if (cnt < 2)
+				throw -1;
+			cnt--;
 			break;
 		case TokenType::Sp_Operator:
-			if (o.get_str() == "(") {
-				s.push(o);
-			}
-			else if (o.get_str() == ")") {
-				while (s.top().get_str() != "(") {
-					res.push_back(s.pop());
-				}
-				s.pop();
-			}
+			
+			break;
+		case TokenType::End:
+			//???
 			break;
 		default:
 			break;
 		}
 	}
-	*/
+	if (cnt != 1)
+		throw -1;
 
 	return res;
 }

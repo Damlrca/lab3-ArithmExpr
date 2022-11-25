@@ -17,7 +17,7 @@ int main() {
 	auto t1 = lex(s);
 	for (auto o : t1)
 		cout << o << endl;
-	/*cout << "postfix:" << endl;
+	cout << "postfix:" << endl;
 	auto t2 = parse(t1);
 	for (auto o : t2)
 		cout << o << endl;
@@ -58,6 +58,6 @@ int main() {
 			break;
 		}
 	}
-	cout << st.pop() << endl;*/
+	cout << st.pop() << endl;
 	return 0;
 }
