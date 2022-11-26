@@ -1,7 +1,7 @@
 #ifndef __CALC_STACK_HPP__
 #define __CALC_STACK_HPP__
 
-#include <utility>
+#include <exception>
 #include "uninit_mem.hpp"
 
 template<class T>
@@ -48,13 +48,13 @@ public:
 
 	T& top() {
 		if (empty())
-			throw - 1;
+			throw std::exception{ "top() in empty Stack" };
 		return m.ptr()[_top];
 	}
 
 	T pop() {
 		if (empty())
-			throw -1;
+			throw std::exception{ "pop() in empty Stack" };
 		T temp{ std::move(m.ptr()[_top]) };
 		(m.ptr() + _top)->~T();
 		_top--;
