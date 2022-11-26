@@ -4,7 +4,7 @@
 
 using namespace std;
 
-bool operator>=(const Token& l, const Token& r) {
+bool Token_cmp(const Token& l, const Token& r) {
 	// un+ un-
 	// * /
 	// bn+ bn-
@@ -17,8 +17,8 @@ bool operator>=(const Token& l, const Token& r) {
 		return false;
 	if (l.get_str() == "*" || l.get_str() == "/")
 		return true;
-	if (r.get_str() == "+" || r.get_str() == "-");
-	return false;
+	if (r.get_str() == "+" || r.get_str() == "-")
+		return false;
 }
 
 ostream& operator<<(ostream& out, const Token& t) {
@@ -161,7 +161,7 @@ vector<Token> parse(const vector<Token>& input) {
 			break;
 		case TokenType::Un_Operator:
 		case TokenType::Bn_Operator:
-			while (!s.empty() && s.top() >= input[i])
+			while (!s.empty() && Token_cmp(s.top(), input[i]))
 				res.push_back(s.pop());
 			s.push(input[i]);
 			break;
@@ -202,36 +202,6 @@ vector<Token> parse(const vector<Token>& input) {
 		}
 		res.push_back(s.pop());
 	}
-
-	//int cnt = 0;
-	//for (const auto &o : res) {
-	//	switch (o.get_type())
-	//	{
-	//	case TokenType::Number:
-	//	case TokenType::Name:
-	//		cnt++;
-	//		break;
-	//	case TokenType::Un_Operator:
-	//		if (cnt < 1)
-	//			throw -1;
-	//		break;
-	//	case TokenType::Bn_Operator:
-	//		if (cnt < 2)
-	//			throw -1;
-	//		cnt--;
-	//		break;
-	//	case TokenType::Sp_Operator:
-	//		
-	//		break;
-	//	case TokenType::End:
-	//		//???
-	//		break;
-	//	default:
-	//		break;
-	//	}
-	//}
-	//if (cnt != 1)
-	//	throw -1;
-
+	
 	return res;
 }

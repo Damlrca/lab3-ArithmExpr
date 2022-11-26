@@ -45,5 +45,31 @@ int main() {
 		cout << "result: "; cout << a.calculate();
 		cout << endl << endl;
 	}
+	while (true) {
+		string command; cin >> command;
+		if (command == "calc") {
+			string expr;
+			getline(cin, expr);
+
+			auto t1 = lex(expr);
+			auto t2 = parse(t1);
+			ArithmExpr a{ t1, t2 };
+			cout << "infix: \" ";
+			a.print_infix();
+			cout << " \"" << endl;
+			cout << "postfix: \" ";
+			a.print_postfix();
+			cout << " \"" << endl;
+			cout << "result: "; cout << a.calculate();
+			cout << endl << endl;
+
+		}
+		else if (command == "exit") {
+			break;
+		}
+		else {
+			cout << "unknown command" << endl;
+		}
+	}
 	return 0;
 }

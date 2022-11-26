@@ -31,7 +31,7 @@
 - \<special\>: `( ) =`
 
 **Number**:
-- constant real number
+- real number
 
 **Name**:
 - a string of Latin letters and the symbol `_` and numbers. First character is a Latin letter or the symbol `_`
@@ -51,7 +51,7 @@ private:
 - constructor `ArithmExpr(vector<Token> (infix, Expr), vector<Token> (postfix, Expr) )`
 
 public:
-- print
+- print_infix
 - print_postix
 - calculate
 
