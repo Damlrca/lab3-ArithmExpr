@@ -1,7 +1,7 @@
 #ifndef __CALC_QUEUE_HPP__
 #define __CALC_QUEUE_HPP__
 
-#include <utility>
+#include <exception>
 #include "uninit_mem.hpp"
 
 template<class T>
@@ -50,9 +50,15 @@ public:
 
 	bool empty() const { return next(end) == start; }
 
+	T& front() {
+		if (empty())
+			throw std::exception{ "front() in empty Queue" };
+		return m.ptr()[start];
+	}
+
 	T pop() {
 		if (empty())
-			throw -1;
+			throw std::exception{ "pop() in empty Queue" };
 		T t{ std::move(m.ptr()[start]) };
 		(m.ptr() + start)->~T();
 		start = next(start);
