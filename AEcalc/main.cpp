@@ -52,27 +52,34 @@ int main() {
 		string expr;
 		getline(cin, expr);
 		if (command == "calc") {
-			auto t1 = lex(expr);
-			auto t2 = parse(t1);
 
-			if (debug_mode) {
-				for (auto &o : t1)
-					cout << o << endl;
-				cout << "postfix:" << endl;
-				for (auto &o : t2)
-					cout << o << endl;
-				cout << "ArithmExpr:" << endl;
+			try {
+				auto t1 = lex(expr);
+				auto t2 = parse(t1);
+
+				if (debug_mode) {
+					for (auto& o : t1)
+						cout << o << endl;
+					cout << "postfix:" << endl;
+					for (auto& o : t2)
+						cout << o << endl;
+					cout << "ArithmExpr:" << endl;
+				}
+
+				ArithmExpr a{ t1, t2 };
+				cout << "infix: \" ";
+				a.print_infix();
+				cout << " \"" << endl;
+				cout << "postfix: \" ";
+				a.print_postfix();
+				cout << " \"" << endl;
+				cout << "result: "; cout << a.calculate();
+				cout << endl << endl;
 			}
-
-			ArithmExpr a{ t1, t2 };
-			cout << "infix: \" ";
-			a.print_infix();
-			cout << " \"" << endl;
-			cout << "postfix: \" ";
-			a.print_postfix();
-			cout << " \"" << endl;
-			cout << "result: "; cout << a.calculate();
-			cout << endl << endl;
+			catch (calc_exception& c) {
+				cout << "exception: " << c.get_str();
+				cout << endl << endl;
+			}
 
 		}
 		else if (command == "debug") {

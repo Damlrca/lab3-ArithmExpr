@@ -58,15 +58,15 @@ public:
 		{
 		case TokenType::Un_Operator:
 			if (s != "+" && s != "-")
-				throw Token_error{ "Token(TokenType, string) : \"" + s + "\" is not supported unary operation"};
+				throw Token_error{ "Token(TokenType, string) : '" + s + "' is not supported unary operation"};
 			break;
 		case TokenType::Bn_Operator:
 			if (s != "*" && s != "/" && s != "+" && s != "-")
-				throw Token_error{ "Token(TokenType, string) : \"" + s + "\" is not supported binary operation" };
+				throw Token_error{ "Token(TokenType, string) : '" + s + "' is not supported binary operation" };
 			break;
 		case TokenType::Sp_Operator:
 			if (s != "(" && s != ")" && s != "=")
-				throw Token_error{ "Token(TokenType, string) : \"" + s + "\" is not supported special operation" };
+				throw Token_error{ "Token(TokenType, string) : '" + s + "' is not supported special operation" };
 			break;
 		case TokenType::Name:
 		{

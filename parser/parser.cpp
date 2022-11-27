@@ -162,6 +162,9 @@ vector<Token> parse(const vector<Token>& input) {
 	Stack<Token> s;
 
 	for (int i = 0; i < size; i++) {
+		if (!res.empty() && res.back().get_type() == TokenType::End)
+			break;
+
 		switch (input[i].get_type())
 		{
 		case TokenType::Number:
@@ -186,7 +189,7 @@ vector<Token> parse(const vector<Token>& input) {
 					s.pop();
 				}
 				else {
-					throw exception{ "missing \"(\" operator" };
+					throw parser_error{ "parse : missing '(' operator" };
 				}
 			}
 			else if (input[i].get_str() == "=") {
@@ -194,11 +197,15 @@ vector<Token> parse(const vector<Token>& input) {
 					res.push_back(s.pop());
 				}
 				s.push(input[i]);
-				// throws when what ???
+			}
+			else {
+				throw parser_error{ "parse : unknown special operation" };
 			}
 			break;
 		case TokenType::End:
-			//???
+			while (!s.empty())
+				res.push_back(s.pop());
+			res.push_back(input[i]);
 			break;
 		default:
 			break;
@@ -207,10 +214,66 @@ vector<Token> parse(const vector<Token>& input) {
 
 	while (!s.empty()) {
 		if (s.top().get_str() == "(") {
-			throw exception{ "missing \")\" operator" };
+			throw parser_error{ "parse : missing ')' operator" };
 		}
 		res.push_back(s.pop());
 	}
 	
+	Stack<Token> test;
+	for (const auto& o : res) {
+		switch (o.get_type())
+		{
+		case TokenType::Number:
+		case TokenType::Name:
+			test.push(o);
+			break;
+		case TokenType::Un_Operator:
+		{
+			if (test.empty())
+				throw parser_error{ "parse : missing operand of unary operation '" + o.get_str() + "'" };
+			auto x = test.pop();
+			test.push(Token{ TokenType::Number, 0 });
+			break;
+		}
+		case TokenType::Bn_Operator:
+		{
+			if (test.empty())
+				throw parser_error{ "parse : missing operand of binary operation '" + o.get_str() + "'" };
+			auto Y = test.pop();
+			if (test.empty())
+				throw parser_error{ "parse : missing operand of binary operation '" + o.get_str() + "'" };
+			auto X = test.pop();
+			test.push(Token{ TokenType::Number, 0 });
+			break;
+		}
+		case TokenType::Sp_Operator:
+		{
+			if (o.get_str() != "=")
+				throw parser_error{ "parse : unexpected special operation '" + o.get_str() + "'" };
+			if (test.empty())
+				throw parser_error{ "parse : missing operand of special operation '" + o.get_str() + "'" };
+			auto Y = test.pop();
+			if (test.empty())
+				throw parser_error{ "parse : missing operand of special operation '" + o.get_str() + "'" };
+			auto X = test.pop();
+			if (X.get_type() != TokenType::Name)
+				throw parser_error{ "parse : left operand of special operation '" + o.get_str() + "' is not Name" };
+			test.push(X);
+			break;
+		}
+		case TokenType::End:
+			break;
+		default:
+			break;
+		}
+	}
+	if (test.empty())
+		throw parser_error{ "parse : empty expression result" };
+	auto t = test.pop();
+	if (!test.empty())
+		throw parser_error{ "parse : uncompleted expression" };
+	if (t.get_type() != TokenType::Name && t.get_type() != TokenType::Number)
+		throw parser_error{ "parse : incorrect expression" };
+
 	return res;
 }

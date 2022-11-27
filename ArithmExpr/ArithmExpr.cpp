@@ -48,7 +48,7 @@ double get_value(Token t) {
 	else if (t.get_type() == TokenType::Name)
 		return table[t.get_str()];
 	else
-		throw -1;
+		throw ArithmExpr_error{ "get_value : unexpected Token" };
 }
 
 double ArithmExpr::calculate() {
