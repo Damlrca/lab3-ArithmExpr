@@ -5,10 +5,11 @@
 #include "Stack.hpp"
 #include "ArithmExpr.hpp"
 #include "parser.hpp"
+
 using namespace std;
 
 int main() {
-	string s[]{ {"(12e-1 + 13.25e1) -.23e2 * (3 + 2)"}
+	/*string s[]{{"(12e-1 + 13.25e1) -.23e2 * (3 + 2)"}
 				,{"(10*(-25)+13.53 - (-0.12))*32 + 32/0.5"}
 				,{"a"}
 				,{"a = 2"}
@@ -28,12 +29,12 @@ int main() {
 		//auto t = get_ArithmExpr_vector(c);
 		auto t1 = lex(c);
 		auto t2 = parse(t1);
-		/*cout << "infix:" << endl;
-		for (auto o : t1)
-			cout << o << endl;
-		cout << "postfix:" << endl;
-		for (auto o : t2)
-			cout << o << endl;*/
+		cout << "infix:" << endl;
+		//for (auto o : t1)
+		//	cout << o << endl;
+		//cout << "postfix:" << endl;
+		//for (auto o : t2)
+		//	cout << o << endl;
 		//cout << "ArithmExpr:" << endl;
 		ArithmExpr a{ t1, t2 };
 		cout << "infix: \" ";
@@ -44,15 +45,25 @@ int main() {
 		cout << " \"" << endl;
 		cout << "result: "; cout << a.calculate();
 		cout << endl << endl;
-	}
+	}*/
+	bool debug_mode = 0;
 	while (true) {
 		string command; cin >> command;
+		string expr;
+		getline(cin, expr);
 		if (command == "calc") {
-			string expr;
-			getline(cin, expr);
-
 			auto t1 = lex(expr);
 			auto t2 = parse(t1);
+
+			if (debug_mode) {
+				for (auto &o : t1)
+					cout << o << endl;
+				cout << "postfix:" << endl;
+				for (auto &o : t2)
+					cout << o << endl;
+				cout << "ArithmExpr:" << endl;
+			}
+
 			ArithmExpr a{ t1, t2 };
 			cout << "infix: \" ";
 			a.print_infix();
@@ -64,11 +75,17 @@ int main() {
 			cout << endl << endl;
 
 		}
+		else if (command == "debug") {
+			debug_mode = !debug_mode;
+			cout << (debug_mode ? "Debug mode is on" : "Debug mode is off");
+			cout << endl << endl;
+		}
 		else if (command == "exit") {
 			break;
 		}
 		else {
-			cout << "unknown command" << endl;
+			cout << "unknown command";
+			cout << endl << endl;
 		}
 	}
 	return 0;

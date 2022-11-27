@@ -69,7 +69,7 @@ double ArithmExpr::calculate() {
 			if (o.get_str() == "-")
 				s.push(Token{ TokenType::Number, -get_value(x) });
 			else //if (o.get_str() == "+")
-				s.push(Token{ TokenType::Number, get_value(x) });
+				s.push(Token{ TokenType::Number, +get_value(x) });
 			break;
 		}
 		case TokenType::Bn_Operator:

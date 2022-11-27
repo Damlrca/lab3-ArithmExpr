@@ -4,23 +4,6 @@
 
 using namespace std;
 
-bool Token_cmp(const Token& l, const Token& r) {
-	// un+ un-
-	// * /
-	// bn+ bn-
-	// ( ) = ???
-	if (l.get_type() == TokenType::Sp_Operator)
-		return false;
-	if (l.get_type() == TokenType::Un_Operator)
-		return true;
-	if (r.get_type() == TokenType::Un_Operator)
-		return false;
-	if (l.get_str() == "*" || l.get_str() == "/")
-		return true;
-	if (r.get_str() == "+" || r.get_str() == "-")
-		return false;
-}
-
 ostream& operator<<(ostream& out, const Token& t) {
 	out << "{";
 	switch (t.get_type())
@@ -41,7 +24,7 @@ ostream& operator<<(ostream& out, const Token& t) {
 		out << t.get_str() << ", name";
 		break;
 	case TokenType::End:
-		out << "END, end";
+		out << "END TOKEN";
 		break;
 	default:
 		out << "INCORRECT TOKEN";
@@ -49,6 +32,32 @@ ostream& operator<<(ostream& out, const Token& t) {
 	}
 	out << "}";
 	return out;
+}
+
+bool Operator_cmp(const Token& comp, const Token& basis) {
+	if (comp.get_type() != TokenType::Un_Operator &&
+		comp.get_type() != TokenType::Bn_Operator &&
+		comp.get_type() != TokenType::Sp_Operator)
+		throw cmp_error{ "comparable Token TokenType is not Operator" };
+	if (basis.get_type() != TokenType::Un_Operator &&
+		basis.get_type() != TokenType::Bn_Operator &&
+		basis.get_type() != TokenType::Sp_Operator)
+		throw cmp_error{ "basis Token TokenType is not Operator" };
+	
+	if (comp.get_type() == TokenType::Sp_Operator)
+		return false;
+
+	if (basis.get_type() == TokenType::Un_Operator)
+		return false;
+	if (comp.get_type() == TokenType::Un_Operator)
+		return true;
+
+	if (comp.get_str() == "*" || comp.get_str() == "/")
+		return true;
+	if (basis.get_str() == "*" || basis.get_str() == "/")
+		return false;
+
+	return true;
 }
 
 vector<Token> lex(string input) {
@@ -161,7 +170,7 @@ vector<Token> parse(const vector<Token>& input) {
 			break;
 		case TokenType::Un_Operator:
 		case TokenType::Bn_Operator:
-			while (!s.empty() && Token_cmp(s.top(), input[i]))
+			while (!s.empty() && Operator_cmp(s.top(), input[i]))
 				res.push_back(s.pop());
 			s.push(input[i]);
 			break;

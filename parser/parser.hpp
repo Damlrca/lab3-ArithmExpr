@@ -19,6 +19,21 @@ public:
 	Token_error(std::string _s) : calc_exception{_s} {}
 };
 
+class cmp_error : public calc_exception {
+public:
+	cmp_error(std::string _s) : calc_exception{ _s } {}
+};
+
+class lexer_error : public calc_exception {
+public:
+	lexer_error(std::string _s) : calc_exception{ _s } {}
+};
+
+class parser_error : public calc_exception {
+public:
+	parser_error(std::string _s) : calc_exception{ _s } {}
+};
+
 enum class TokenType {
 	Un_Operator,  //str: +(unary) -(unary)
 	Bn_Operator,  //str: +(binary) -(binary) * /
@@ -83,9 +98,9 @@ public:
 	double get_val() const { return val; }
 };
 
-bool Token_cmp(const Token& l, const Token& r);
-
 std::ostream& operator<<(std::ostream& out, const Token& t);
+
+bool Operator_cmp(const Token& l, const Token& r);
 
 std::vector<Token> lex(std::string input);
 
