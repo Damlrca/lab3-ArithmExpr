@@ -6,26 +6,25 @@ map<string, double> table;
 
 void ArithmExpr::print(ostream& out, const vector<Token>& v) const {
 	bool not_empty = 0;
-	stringstream ss;
 	for (const auto& o : v) {
 		switch (o.get_type())
 		{
 		case TokenType::Number:
 			if (not_empty)
-				ss << " ";
+				out << " ";
 			else
 				not_empty = true;
-			ss << o.get_val();
+			out << o.get_val();
 			break;
 		case TokenType::Name:
 		case TokenType::Un_Operator:
 		case TokenType::Bn_Operator:
 		case TokenType::Sp_Operator:
 			if (not_empty)
-				ss << " ";
+				out << " ";
 			else
 				not_empty = true;
-			ss << o.get_str();
+			out << o.get_str();
 			break;
 		case TokenType::End:
 			break;
@@ -33,7 +32,6 @@ void ArithmExpr::print(ostream& out, const vector<Token>& v) const {
 			break;
 		}
 	}
-	out << ss.str();
 }
 
 void ArithmExpr::print_infix(ostream& out) const {

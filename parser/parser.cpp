@@ -38,13 +38,15 @@ bool Operator_cmp(const Token& comp, const Token& basis) {
 	if (comp.get_type() != TokenType::Un_Operator &&
 		comp.get_type() != TokenType::Bn_Operator &&
 		comp.get_type() != TokenType::Sp_Operator)
-		throw cmp_error{ "comparable Token TokenType is not Operator" };
+		throw cmp_error{ "Operator_cmp() : comparable Token TokenType is not Operator" };
 	if (basis.get_type() != TokenType::Un_Operator &&
 		basis.get_type() != TokenType::Bn_Operator &&
 		basis.get_type() != TokenType::Sp_Operator)
-		throw cmp_error{ "basis Token TokenType is not Operator" };
+		throw cmp_error{ "Operator_cmp() : basis Token TokenType is not Operator" };
 	
 	if (comp.get_type() == TokenType::Sp_Operator)
+		return false;
+	if (basis.get_type() == TokenType::Sp_Operator)
 		return false;
 
 	if (basis.get_type() == TokenType::Un_Operator)
@@ -84,15 +86,13 @@ vector<Token> lex(string input) {
 			i++;
 			break;
 		case '+': case '-':
-			if (input[i] == '+' || input[i] == '-') {
-				if (!res.empty() && (
-					res.back().get_type() == TokenType::Name ||
-					res.back().get_type() == TokenType::Number ||
-					res.back().get_str() == ")" ))
-					res.push_back(Token{ TokenType::Bn_Operator, string{input[i]} });
-				else
-					res.push_back(Token{ TokenType::Un_Operator, string{input[i]} });
-			}
+			if (!res.empty() && (
+				res.back().get_type() == TokenType::Number ||
+				res.back().get_type() == TokenType::Name ||
+				res.back().get_str() == ")" ))
+				res.push_back(Token{ TokenType::Bn_Operator, string{input[i]} });
+			else
+				res.push_back(Token{ TokenType::Un_Operator, string{input[i]} });
 			i++;
 			break;
 		default:
@@ -101,34 +101,34 @@ vector<Token> lex(string input) {
 			if ((input[i] >= '0' && input[i] <= '9') || input[i] == '.') {
 				// 111.222e-333
 				while (i < size && input[i] >= '0' && input[i] <= '9') {
-					temp.push_back(input[i]);
+					temp += input[i];
 					i++;
 				}
 				if (i < size && input[i] == '.') {
-					temp.push_back(input[i]);
+					temp += input[i];
 					i++;
 				}
 				while (i < size && input[i] >= '0' && input[i] <= '9') {
-					temp.push_back(input[i]);
+					temp += input[i];
 					i++;
 				}
 				if (i < size && (input[i] == 'e' || input[i] == 'E')) {
-					temp.push_back(input[i]);
+					temp += input[i];
 					i++;
 					if (i < size && input[i] == '-') {
-						temp.push_back(input[i]);
+						temp += input[i];
 						i++;
 					}
 					while (i < size && input[i] >= '0' && input[i] <= '9') {
-						temp.push_back(input[i]);
+						temp += input[i];
 						i++;
 					}
 				}
-				try { // can stod throw?
+				try {
 					res.push_back(Token{ TokenType::Number, stod(temp) });
 				}
 				catch (...) {
-					throw exception{ "wrong real number format" };
+					throw lexer_error{ "lex : incorrect real number format" };
 				}
 			}
 			else if ( input[i] == '_' ||
@@ -139,13 +139,13 @@ vector<Token> lex(string input) {
 					(input[i] >= 'A' && input[i] <= 'Z') ||
 					(input[i] >= 'a' && input[i] <= 'z') ||
 					(input[i] >= '0' && input[i] <= '9') ) ) {
-					temp.push_back(input[i]);
+					temp += input[i];
 					i++;
 				}
 				res.push_back(Token{ TokenType::Name, temp });
 			}
 			else {
-				throw exception{ "unknown symbol" };
+				throw lexer_error{ "lex : unknown symbol" };
 			}
 		}
 			break;

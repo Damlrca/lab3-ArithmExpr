@@ -23,7 +23,6 @@ public:
 	void print_infix(std::ostream& = std::cout) const;
 	void print_postfix(std::ostream& = std::cout) const;
 	double calculate();
-	//friend std::vector<ArithmExpr> get_ArithmExpr_vector(const std::string&);
 };
 
 std::vector<ArithmExpr> get_ArithmExpr_vector(const std::string&);
