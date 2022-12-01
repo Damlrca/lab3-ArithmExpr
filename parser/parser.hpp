@@ -7,31 +7,31 @@
 #include "Stack.hpp"
 #include "Queue.hpp"
 
-class calc_exception {
+class parser_lib_exception {
 	std::string s;
 public:
-	calc_exception(std::string _s) : s{_s} {}
+	parser_lib_exception(std::string _s) : s{_s} {}
 	std::string get_str() { return s; };
 };
 
-class Token_error : public calc_exception {
+class Token_error : public parser_lib_exception {
 public:
-	Token_error(std::string _s) : calc_exception{_s} {}
+	Token_error(std::string _s) : parser_lib_exception{_s} {}
 };
 
-class cmp_error : public calc_exception {
+class cmp_error : public parser_lib_exception {
 public:
-	cmp_error(std::string _s) : calc_exception{ _s } {}
+	cmp_error(std::string _s) : parser_lib_exception{ _s } {}
 };
 
-class lexer_error : public calc_exception {
+class lexer_error : public parser_lib_exception {
 public:
-	lexer_error(std::string _s) : calc_exception{ _s } {}
+	lexer_error(std::string _s) : parser_lib_exception{ _s } {}
 };
 
-class parser_error : public calc_exception {
+class parser_error : public parser_lib_exception {
 public:
-	parser_error(std::string _s) : calc_exception{ _s } {}
+	parser_error(std::string _s) : parser_lib_exception{ _s } {}
 };
 
 enum class TokenType {
@@ -100,10 +100,12 @@ public:
 
 std::ostream& operator<<(std::ostream& out, const Token& t);
 
-bool Operator_cmp(const Token& l, const Token& r);
+std::vector<Token> lex(const std::string& input);
 
-std::vector<Token> lex(std::string input);
+bool Compare_Operators_Tokens(const Token& l, const Token& r);
 
 std::vector<Token> parse(const std::vector<Token>&);
+
+void check_expr_correctness(const std::vector<Token>&);
 
 #endif // !__CALC_PARSER_HPP__

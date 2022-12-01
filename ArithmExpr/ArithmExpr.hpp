@@ -12,9 +12,9 @@
 
 extern std::map<std::string, double> table;
 
-class ArithmExpr_error : public calc_exception {
+class ArithmExpr_error : public parser_lib_exception {
 public:
-	ArithmExpr_error(std::string _s) : calc_exception{ _s } {}
+	ArithmExpr_error(std::string _s) : parser_lib_exception{ _s } {}
 };
 
 class ArithmExpr {

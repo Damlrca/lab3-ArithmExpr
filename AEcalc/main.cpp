@@ -52,20 +52,22 @@ int main() {
 		string expr;
 		getline(cin, expr);
 		if (command == "calc") {
-
 			try {
 				auto t1 = lex(expr);
-				auto t2 = parse(t1);
-
 				if (debug_mode) {
+					cout << "infix (lex):" << endl;
 					for (auto& o : t1)
 						cout << o << endl;
-					cout << "postfix:" << endl;
-					for (auto& o : t2)
-						cout << o << endl;
-					cout << "ArithmExpr:" << endl;
 				}
 
+				auto t2 = parse(t1);
+				if (debug_mode) {
+					cout << "postfix (parse):" << endl;
+					for (auto& o : t2)
+						cout << o << endl;
+				}
+
+				cout << "ArithmExpr:" << endl;
 				ArithmExpr a{ t1, t2 };
 				cout << "infix: \" ";
 				a.print_infix();
@@ -74,26 +76,23 @@ int main() {
 				a.print_postfix();
 				cout << " \"" << endl;
 				cout << "result: "; cout << a.calculate();
-				cout << endl << endl;
 			}
-			catch (calc_exception& c) {
+			catch (parser_lib_exception& c) {
 				cout << "exception: " << c.get_str();
-				cout << endl << endl;
 			}
 
 		}
 		else if (command == "debug") {
 			debug_mode = !debug_mode;
 			cout << (debug_mode ? "Debug mode is on" : "Debug mode is off");
-			cout << endl << endl;
 		}
 		else if (command == "exit") {
 			break;
 		}
 		else {
 			cout << "unknown command";
-			cout << endl << endl;
 		}
+		cout << endl << endl;
 	}
 	return 0;
 }

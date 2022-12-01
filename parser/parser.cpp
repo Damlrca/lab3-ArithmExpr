@@ -34,35 +34,7 @@ ostream& operator<<(ostream& out, const Token& t) {
 	return out;
 }
 
-bool Operator_cmp(const Token& comp, const Token& basis) {
-	if (comp.get_type() != TokenType::Un_Operator &&
-		comp.get_type() != TokenType::Bn_Operator &&
-		comp.get_type() != TokenType::Sp_Operator)
-		throw cmp_error{ "Operator_cmp() : comparable Token TokenType is not Operator" };
-	if (basis.get_type() != TokenType::Un_Operator &&
-		basis.get_type() != TokenType::Bn_Operator &&
-		basis.get_type() != TokenType::Sp_Operator)
-		throw cmp_error{ "Operator_cmp() : basis Token TokenType is not Operator" };
-	
-	if (comp.get_type() == TokenType::Sp_Operator)
-		return false;
-	if (basis.get_type() == TokenType::Sp_Operator)
-		return false;
-
-	if (basis.get_type() == TokenType::Un_Operator)
-		return false;
-	if (comp.get_type() == TokenType::Un_Operator)
-		return true;
-
-	if (comp.get_str() == "*" || comp.get_str() == "/")
-		return true;
-	if (basis.get_str() == "*" || basis.get_str() == "/")
-		return false;
-
-	return true;
-}
-
-vector<Token> lex(string input) {
+vector<Token> lex(const string& input) {
 	vector<Token> res;
 
 	int size = input.size();
@@ -155,7 +127,37 @@ vector<Token> lex(string input) {
 	return res;
 }
 
+bool Compare_Operators_Tokens(const Token& comp, const Token& basis) {
+	if (comp.get_type() != TokenType::Un_Operator &&
+		comp.get_type() != TokenType::Bn_Operator &&
+		comp.get_type() != TokenType::Sp_Operator)
+		throw cmp_error{ "Operator_cmp() : comparable Token TokenType is not Operator" };
+	if (basis.get_type() != TokenType::Un_Operator &&
+		basis.get_type() != TokenType::Bn_Operator &&
+		basis.get_type() != TokenType::Sp_Operator)
+		throw cmp_error{ "Operator_cmp() : basis Token TokenType is not Operator" };
+
+	if (comp.get_type() == TokenType::Sp_Operator)
+		return false;
+	if (basis.get_type() == TokenType::Sp_Operator)
+		return false;
+
+	if (basis.get_type() == TokenType::Un_Operator)
+		return false;
+	if (comp.get_type() == TokenType::Un_Operator)
+		return true;
+
+	if (comp.get_str() == "*" || comp.get_str() == "/")
+		return true;
+	if (basis.get_str() == "*" || basis.get_str() == "/")
+		return false;
+
+	return true;
+}
+
 vector<Token> parse(const vector<Token>& input) {
+	check_expr_correctness(input);
+
 	vector<Token> res;
 
 	int size = input.size();
@@ -173,7 +175,7 @@ vector<Token> parse(const vector<Token>& input) {
 			break;
 		case TokenType::Un_Operator:
 		case TokenType::Bn_Operator:
-			while (!s.empty() && Operator_cmp(s.top(), input[i]))
+			while (!s.empty() && Compare_Operators_Tokens(s.top(), input[i]))
 				res.push_back(s.pop());
 			s.push(input[i]);
 			break;
@@ -276,4 +278,34 @@ vector<Token> parse(const vector<Token>& input) {
 		throw parser_error{ "parse : incorrect expression" };
 
 	return res;
+}
+
+void check_expr_correctness(const vector<Token>& input) {
+	int cnt_parenthesis = 0;
+	int size = input.size();
+	for (int i = 0; i < size; i++) {
+		switch (input[i].get_type())
+		{
+		case TokenType::Un_Operator:
+
+			break;
+		case TokenType::Bn_Operator:
+
+			break;
+		case TokenType::Sp_Operator:
+
+			break;
+		case TokenType::Number:
+		case TokenType::Name:
+
+			break;
+		case TokenType::End:
+
+			break;
+		default:
+			break;
+		}
+	}
+	if (cnt_parenthesis)
+		throw -1;
 }
