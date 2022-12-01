@@ -63,20 +63,22 @@ double ArithmExpr::calculate() {
 			break;
 		case TokenType::Un_Operator:
 		{
+			if (s.empty())
+				throw ArithmExpr_error{ "ArithmExpr::calculate() : missing operand of unary operation '" + o.get_str() + "'" };
 			auto x = s.pop();
 			if (o.get_str() == "-")
 				s.push(Token{ TokenType::Number, -get_value(x) });
-			else //if (o.get_str() == "+")
+			else if (o.get_str() == "+")
 				s.push(Token{ TokenType::Number, +get_value(x) });
 			break;
 		}
 		case TokenType::Bn_Operator:
 		{
 			if (s.empty())
-				throw -1;
+				throw ArithmExpr_error{ "ArithmExpr::calculate() : missing operand of binary operation '" + o.get_str() + "'" };
 			auto Y = s.pop();
 			if (s.empty())
-				throw -1;
+				throw ArithmExpr_error{ "ArithmExpr::calculate() : missing operand of binary operation '" + o.get_str() + "'" };
 			auto X = s.pop();
 			if (o.get_str() == "+")
 				s.push(Token{ TokenType::Number, get_value(X) + get_value(Y) });
@@ -91,25 +93,33 @@ double ArithmExpr::calculate() {
 		case TokenType::Sp_Operator:
 		{
 			if (o.get_str() != "=")
-				throw -1;
+				throw ArithmExpr_error{ "ArithmExpr::calculate() : unexpected special operation '" + o.get_str() + "'" };
 			if (s.empty())
-				throw -1;
+				throw ArithmExpr_error{ "ArithmExpr::calculate() : missing operand of special operation '" + o.get_str() + "'" };
 			auto Y = s.pop();
 			if (s.empty())
-				throw -1;
+				throw ArithmExpr_error{ "ArithmExpr::calculate() : missing operand of special operation '" + o.get_str() + "'" };
 			auto X = s.pop();
 			if (X.get_type() != TokenType::Name)
-				throw -1;
+				throw ArithmExpr_error{ "ArithmExpr::calculate() : left operand of special operation '" + o.get_str() + "' is not Name" };
 			table[X.get_str()] = get_value(Y);
 			s.push(X);
 			break;
 		}
+		case TokenType::End:
+			break;
 		default:
 			break;
 		}
 	}
-
-	return get_value(s.pop());
+	if (s.empty())
+		throw parser_error{ "parse : empty expression result" };
+	auto t = s.pop();
+	if (!s.empty())
+		throw parser_error{ "parse : uncompleted expression" };
+	if (t.get_type() != TokenType::Name && t.get_type() != TokenType::Number)
+		throw parser_error{ "parse : incorrect expression" };
+	return get_value(t);
 }
 
 vector<ArithmExpr> get_ArithmExpr_vector(const string& str) {
