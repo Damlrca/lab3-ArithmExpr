@@ -287,17 +287,61 @@ void check_expr_correctness(const vector<Token>& input) {
 		switch (input[i].get_type())
 		{
 		case TokenType::Un_Operator:
-
+			if (i + 1 == size || (
+				input[i + 1].get_type() != TokenType::Un_Operator &&
+				input[i + 1].get_type() != TokenType::Number &&
+				input[i + 1].get_type() != TokenType::Name &&
+				input[i + 1].get_str() != "(" ))
+				throw check_error{ "check : missing operand of unary operation '" + input[i].get_str() + "'"};
 			break;
 		case TokenType::Bn_Operator:
-
+			if (i == 0 || (
+				input[i - 1].get_type() != TokenType::Number &&
+				input[i - 1].get_type() != TokenType::Name &&
+				input[i - 1].get_str() != ")"))
+				throw check_error{ "check : missing left operand of binary operation '" + input[i].get_str() + "'" };
+			if (i + 1 == size || (
+				input[i + 1].get_type() != TokenType::Un_Operator &&
+				input[i + 1].get_type() != TokenType::Number &&
+				input[i + 1].get_type() != TokenType::Name &&
+				input[i + 1].get_str() != "("))
+				throw check_error{ "check : missing right operand of binary operation '" + input[i].get_str() + "'" };
 			break;
 		case TokenType::Sp_Operator:
-
+			if (input[i].get_str() == "(") {
+				cnt_parenthesis++;
+				if (i > 0 && (
+					input[i - 1].get_type() == TokenType::Number ||
+					input[i - 1].get_type() == TokenType::Name))
+					throw check_error{ "check : missing operator between operand ans '('" };
+			}
+			else if (input[i].get_str() == ")") {
+				if (cnt_parenthesis == 0)
+					throw check_error{ "check : missing '(' operator" };
+				cnt_parenthesis--;
+				if (input[i - 1].get_str() == "(")
+					throw check_error{ "check : empty '()'" };
+			}
+			else if (input[i].get_str() == "=") {
+				if (i == 0 || input[i - 1].get_type() != TokenType::Name)
+					throw check_error{ "check : missing left operand of special operation '" + input[i].get_str() + "'" };
+				if (i + 1 == size || (
+					input[i + 1].get_type() != TokenType::Un_Operator &&
+					input[i + 1].get_type() != TokenType::Number &&
+					input[i + 1].get_type() != TokenType::Name &&
+					input[i + 1].get_str() != "("))
+					throw check_error{ "check : missing right operand of special operation '" + input[i].get_str() + "'" };
+			}
+			else {
+				throw check_error{ "check : unknown special operation" };
+			}
 			break;
 		case TokenType::Number:
 		case TokenType::Name:
-
+			if (i + 1 < size && (
+				input[i + 1].get_type() == TokenType::Name ||
+				input[i + 1].get_type() == TokenType::Number))
+				throw parser_error{ "check : missing operator between two operands" };
 			break;
 		case TokenType::End:
 
@@ -306,6 +350,6 @@ void check_expr_correctness(const vector<Token>& input) {
 			break;
 		}
 	}
-	if (cnt_parenthesis)
-		throw -1;
+	if (cnt_parenthesis > 0)
+		throw check_error{ "check : missing ')' operator" };
 }

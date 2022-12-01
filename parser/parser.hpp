@@ -34,6 +34,11 @@ public:
 	parser_error(std::string _s) : parser_lib_exception{ _s } {}
 };
 
+class check_error : public parser_lib_exception {
+public:
+	check_error(std::string _s) : parser_lib_exception{ _s } {}
+};
+
 enum class TokenType {
 	Un_Operator,  //str: +(unary) -(unary)
 	Bn_Operator,  //str: +(binary) -(binary) * /
