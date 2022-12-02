@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <sstream>
 #include <map>
 #include "parser.hpp"
 #include "Stack.hpp"
@@ -11,17 +12,22 @@
 
 extern std::map<std::string, double> table;
 
+class ArithmExpr_error : public parser_lib_exception {
+public:
+	ArithmExpr_error(std::string _s) : parser_lib_exception{ _s } {}
+};
+
 class ArithmExpr {
 private:
 	std::vector<Token> infix;
 	std::vector<Token> postfix;
+	void print(std::ostream&, const std::vector<Token>&) const;
+public:
 	ArithmExpr(const std::vector<Token>& _infix, const std::vector<Token>& _postfix) : infix{ _infix }, postfix{ _postfix } {}
 	ArithmExpr(std::vector<Token>&& _infix, std::vector<Token>&& _postfix) : infix{ _infix }, postfix{ _postfix } {}
-public:
-	void print(std::ostream& = std::cout);
-	void print_RPN(std::ostream& = std::cout); // Reverse Polish notation
+	void print_infix(std::ostream& = std::cout) const;
+	void print_postfix(std::ostream& = std::cout) const;
 	double calculate();
-	friend std::vector<ArithmExpr> get_ArithmExpr_vector(const std::string&);
 };
 
 std::vector<ArithmExpr> get_ArithmExpr_vector(const std::string&);

@@ -6,12 +6,12 @@
 - `calc Expr-list`
 - `exit`
 
-
 ## Arithmetic Expression syntax:
 
 ### Expression
 
 **Expr-list**:
+- `Expr`
 - `Expr End`
 - `Expr End Expr-list`
 
@@ -23,16 +23,15 @@
 - `( Expr )`
 - `Name = Expr`
 
-
 ### Token types
 
-**Operators**:
-- \<binary\>: `+ - * /`
+**Operators** (sorted by priority):
 - \<unary\>: `+ -`
+- \<binary\>: `* / + -`
 - \<special\>: `( ) =`
 
 **Number**:
-- constant real number
+- real number
 
 **Name**:
 - a string of Latin letters and the symbol `_` and numbers. First character is a Latin letter or the symbol `_`
@@ -40,21 +39,21 @@
 **End**:
 - `\n`
 - `;`
-- `EOF`
 
-## parser lib functions
+## parser library functions
 
-- lex: `string -> vector<Token>`
-- parse: `vector<Token> -> vector<Token> (RPN: Reverse Polish notation)`
+- lex: `string (infix, Expr-list) -> vector<Token> (infix, Expr-list)`
+- parse: `vector<Token> (infix, Expr) -> vector<Token> (postfix, Expr)`
 
 ## ArithmExpr class
 
 private:
-- constructor `ArithmExpr(vector<Token>, vector<Token> (RPN) )`
+- constructor `ArithmExpr(vector<Token> (infix, Expr), vector<Token> (postfix, Expr) )`
 
 public:
-- print
-- print_RPN
+- print_infix
+- print_postix
+- calculate
 
 friend:
-- get_ArithmExpr_vector: `string -> vector<ArithmExpr>`
+- get_ArithmExpr_vector: `string (infix, Expr-list) -> vector<ArithmExpr>`
