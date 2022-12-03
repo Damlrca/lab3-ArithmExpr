@@ -30,6 +30,6 @@ public:
 	double calculate();
 };
 
-std::vector<ArithmExpr> get_ArithmExpr_vector(const std::string&);
+std::vector<ArithmExpr> get_ArithmExpr_vector(const std::string&, bool = false);
 
 #endif // !__CALC_ARITHM_EXPR_HPP__

@@ -122,7 +122,7 @@ double ArithmExpr::calculate() {
 	return get_value(t);
 }
 
-vector<ArithmExpr> get_ArithmExpr_vector(const string& str) {
+vector<ArithmExpr> get_ArithmExpr_vector(const string& str, bool debug_mode) {
 	vector<ArithmExpr> res;
 
 	return res;
