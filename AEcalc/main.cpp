@@ -13,46 +13,39 @@ int main() {
 		string expr; getline(cin, expr);
 		if (command == "calc") {
 			try {
-				auto t1 = lex(expr);
-				if (debug_mode) {
-					cout << "infix (lex):" << endl;
-					for (auto& o : t1)
-						cout << o << endl;
+				auto temp = get_ArithmExpr_vector(expr, debug_mode);
+				int number = 0;
+				for (const auto& o : temp) {
+					cout << "Expr No." << ++number << ": ";
+					if (debug_mode) {
+						cout << endl;
+						cout << "infix: \" ";
+						o.print_infix();
+						cout << " \"" << endl;
+						cout << "postfix: \" ";
+						o.print_postfix();
+						cout << " \"" << endl;
+						cout << "result: ";
+					}
+					cout << o.calculate() << endl;
 				}
-
-				auto t2 = parse(t1);
-				if (debug_mode) {
-					cout << "postfix (parse):" << endl;
-					for (auto& o : t2)
-						cout << o << endl;
-				}
-
-				cout << "ArithmExpr:" << endl;
-				ArithmExpr a{ t1, t2 };
-				cout << "infix: \" ";
-				a.print_infix();
-				cout << " \"" << endl;
-				cout << "postfix: \" ";
-				a.print_postfix();
-				cout << " \"" << endl;
-				cout << "result: "; cout << a.calculate();
 			}
 			catch (calc_exception& c) {
-				cout << "exception: " << c.get_str();
+				cout << "exception: " << c.get_str() << endl;
 			}
+			cout << endl;
 		}
 		else if (command == "debug") {
 			debug_mode = !debug_mode;
 			cout << "debugging mode is ";
-			cout << (debug_mode ? "on" : "off");
+			cout << (debug_mode ? "on" : "off") << endl << endl;
 		}
 		else if (command == "exit") {
 			break;
 		}
 		else {
-			cout << "unknown command";
+			cout << "unknown command" << endl << endl;
 		}
-		cout << endl << endl;
 	}
 	return 0;
 }

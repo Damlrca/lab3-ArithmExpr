@@ -54,11 +54,7 @@ ArithmExpr.hpp:
 
 ## ArithmExpr class
 
-private:
 - constructor `ArithmExpr(vector<Token> (infix, Expr), vector<Token> (postfix, Expr))`
-
-public:
-- constructor `ArithmExpr(vector<Token> (infix, Expr))`
 - print_infix
 - print_postix
 - calculate
