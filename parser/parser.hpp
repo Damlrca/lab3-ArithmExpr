@@ -5,38 +5,12 @@
 #include <vector>
 #include <string>
 #include "Stack.hpp"
-#include "Queue.hpp"
 
-class parser_lib_exception {
+class calc_exception {
 	std::string s;
 public:
-	parser_lib_exception(std::string _s) : s{_s} {}
+	calc_exception(const std::string& _s) : s{_s} {}
 	std::string get_str() { return s; };
-};
-
-class Token_error : public parser_lib_exception {
-public:
-	Token_error(std::string _s) : parser_lib_exception{_s} {}
-};
-
-class cmp_error : public parser_lib_exception {
-public:
-	cmp_error(std::string _s) : parser_lib_exception{ _s } {}
-};
-
-class lexer_error : public parser_lib_exception {
-public:
-	lexer_error(std::string _s) : parser_lib_exception{ _s } {}
-};
-
-class parser_error : public parser_lib_exception {
-public:
-	parser_error(std::string _s) : parser_lib_exception{ _s } {}
-};
-
-class check_error : public parser_lib_exception {
-public:
-	check_error(std::string _s) : parser_lib_exception{ _s } {}
 };
 
 enum class TokenType {
@@ -56,47 +30,47 @@ private:
 public:
 	explicit Token(TokenType t) : type{ t }, str{}, val{} {
 		if (type != TokenType::End)
-			throw Token_error{ "Token(TokenType) : TokenType is not TokenType::End" };
+			throw calc_exception{ "Token(TokenType) : TokenType is not TokenType::End" };
 	}
 	explicit Token(TokenType t, const std::string& s) : type{ t }, str{ s }, val{} {
 		switch (t)
 		{
 		case TokenType::Un_Operator:
 			if (s != "+" && s != "-")
-				throw Token_error{ "Token(TokenType, string) : '" + s + "' is not supported unary operation"};
+				throw calc_exception{ "Token(TokenType, string) : '" + s + "' is not supported unary operation"};
 			break;
 		case TokenType::Bn_Operator:
 			if (s != "*" && s != "/" && s != "+" && s != "-")
-				throw Token_error{ "Token(TokenType, string) : '" + s + "' is not supported binary operation" };
+				throw calc_exception{ "Token(TokenType, string) : '" + s + "' is not supported binary operation" };
 			break;
 		case TokenType::Sp_Operator:
 			if (s != "(" && s != ")" && s != "=")
-				throw Token_error{ "Token(TokenType, string) : '" + s + "' is not supported special operation" };
+				throw calc_exception{ "Token(TokenType, string) : '" + s + "' is not supported special operation" };
 			break;
 		case TokenType::Name:
 		{
 			if (s.empty())
-				throw Token_error{ "Token(TokenType, string) : empty name" };
+				throw calc_exception{ "Token(TokenType, string) : empty name" };
 			if (!( s.front() == '_' ||
 				(s.front() >= 'A' && s.front() <= 'Z') ||
 				(s.front() >= 'a' && s.front() <= 'z')) )
-				throw Token_error{ "Token(TokenType, string) : uncorrect first character in name"};
+				throw calc_exception{ "Token(TokenType, string) : uncorrect first character in name"};
 			for (int i = 0; i < s.size(); i++)
-				if (!( s[i] == '_' ||
+				if (!(s[i] == '_' ||
 					(s[i] >= 'A' && s[i] <= 'Z') ||
 					(s[i] >= 'a' && s[i] <= 'z') ||
-					(s[i] >= '0' && s[i] <= '9')) )
-					throw Token_error{ "Token(TokenType, string) : uncorrect character [" + std::to_string(i+1) + "] in name"};
+					(s[i] >= '0' && s[i] <= '9')))
+					throw calc_exception{ "Token(TokenType, string) : uncorrect character [" + std::to_string(i + 1) + "] in name" };
 		}
 			break;
 		default:
-			throw Token_error{ "Token(TokenType, string) : incorrect TokenType" };
+			throw calc_exception{ "Token(TokenType, string) : unknown TokenType" };
 			break;
 		}
 	}
 	explicit Token(TokenType t, double v) : type{ t }, str{}, val{ v } {
 		if (type != TokenType::Number)
-			throw Token_error{ "Token(TokenType, double) : TokenType is not TokenType::Number" };
+			throw calc_exception{ "Token(TokenType, double) : TokenType is not TokenType::Number" };
 	}
 	TokenType get_type() const { return type; }
 	std::string get_str() const { return str; }
@@ -111,6 +85,8 @@ bool Compare_Operators_Tokens(const Token& l, const Token& r);
 
 std::vector<Token> parse(const std::vector<Token>&);
 
-void check_expr_correctness(const std::vector<Token>&);
+void check_infix_expr_correctness(const std::vector<Token>&);
+
+void check_postfix_expr_correctness(const std::vector<Token>&);
 
 #endif // !__CALC_PARSER_HPP__
