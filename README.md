@@ -4,7 +4,7 @@
 
 **Commands**:
 - `calc Expr-list`
-- `debug` - turns on or off debug mode
+- `debug` - turns on or off debugging mode
 - `exit`
 
 ## Arithmetic Expression syntax:
@@ -27,9 +27,9 @@
 ### Token types
 
 **Operators** (sorted by priority):
-- \<unary\>: `+ -`
-- \<binary\>: `* / + -`
-- \<special\>: `( ) =`
+- unary: `+ -`
+- binary: `* / + -`
+- special: `( ) =`
 
 **Number**:
 - real number
@@ -44,8 +44,10 @@
 
 - lex: `string (infix, Expr-list) -> vector<Token> (infix, Expr-list)`
 - parse: `vector<Token> (infix, Expr) -> vector<Token> (postfix, Expr)`
-- check_expr_correctness: `vector<Token> (infix, Expr) -> void`
-	- throws when expr is incorrect
+- check_infix_expr_correctness: `vector<Token> (infix, Expr)`
+	- throws when infix expr is incorrect
+- check_postfix_expr_correctness: `vector<Token> (postfix, Expr)`
+	- throws when postfix expr is incorrect
 
 ArithmExpr.hpp:
 - get_ArithmExpr_vector `string (infix, Expr-list) -> vector<ArithmExpr>`
@@ -53,10 +55,10 @@ ArithmExpr.hpp:
 ## ArithmExpr class
 
 private:
-- constructor `ArithmExpr(vector<Token> (infix, Expr), vector<Token> (postfix, Expr) )`
+- constructor `ArithmExpr(vector<Token> (infix, Expr), vector<Token> (postfix, Expr))`
 
 public:
-- constructor `ArithmExpr(vector<Token> (infix, Expr)`
+- constructor `ArithmExpr(vector<Token> (infix, Expr))`
 - print_infix
 - print_postix
 - calculate

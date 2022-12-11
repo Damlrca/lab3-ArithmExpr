@@ -48,7 +48,7 @@ double get_value(Token t) {
 	else if (t.get_type() == TokenType::Name)
 		return table[t.get_str()];
 	else
-		throw ArithmExpr_error{ "get_value : unexpected Token" };
+		throw calc_exception{ "get_value : unexpected Token" };
 }
 
 double ArithmExpr::calculate() {
@@ -64,7 +64,7 @@ double ArithmExpr::calculate() {
 		case TokenType::Un_Operator:
 		{
 			if (s.empty())
-				throw ArithmExpr_error{ "ArithmExpr::calculate() : missing operand of unary operation '" + o.get_str() + "'" };
+				throw calc_exception{ "ArithmExpr::calculate() : missing operand of unary operation '" + o.get_str() + "'" };
 			auto x = s.pop();
 			if (o.get_str() == "-")
 				s.push(Token{ TokenType::Number, -get_value(x) });
@@ -75,10 +75,10 @@ double ArithmExpr::calculate() {
 		case TokenType::Bn_Operator:
 		{
 			if (s.empty())
-				throw ArithmExpr_error{ "ArithmExpr::calculate() : missing operand of binary operation '" + o.get_str() + "'" };
+				throw calc_exception{ "ArithmExpr::calculate() : missing operand of binary operation '" + o.get_str() + "'" };
 			auto Y = s.pop();
 			if (s.empty())
-				throw ArithmExpr_error{ "ArithmExpr::calculate() : missing operand of binary operation '" + o.get_str() + "'" };
+				throw calc_exception{ "ArithmExpr::calculate() : missing operand of binary operation '" + o.get_str() + "'" };
 			auto X = s.pop();
 			if (o.get_str() == "+")
 				s.push(Token{ TokenType::Number, get_value(X) + get_value(Y) });
@@ -93,15 +93,15 @@ double ArithmExpr::calculate() {
 		case TokenType::Sp_Operator:
 		{
 			if (o.get_str() != "=")
-				throw ArithmExpr_error{ "ArithmExpr::calculate() : unexpected special operation '" + o.get_str() + "'" };
+				throw calc_exception{ "ArithmExpr::calculate() : unexpected special operation '" + o.get_str() + "'" };
 			if (s.empty())
-				throw ArithmExpr_error{ "ArithmExpr::calculate() : missing operand of special operation '" + o.get_str() + "'" };
+				throw calc_exception{ "ArithmExpr::calculate() : missing operand of special operation '" + o.get_str() + "'" };
 			auto Y = s.pop();
 			if (s.empty())
-				throw ArithmExpr_error{ "ArithmExpr::calculate() : missing operand of special operation '" + o.get_str() + "'" };
+				throw calc_exception{ "ArithmExpr::calculate() : missing operand of special operation '" + o.get_str() + "'" };
 			auto X = s.pop();
 			if (X.get_type() != TokenType::Name)
-				throw ArithmExpr_error{ "ArithmExpr::calculate() : left operand of special operation '" + o.get_str() + "' is not Name" };
+				throw calc_exception{ "ArithmExpr::calculate() : left operand of special operation '" + o.get_str() + "' is not Name" };
 			table[X.get_str()] = get_value(Y);
 			s.push(X);
 			break;
@@ -113,12 +113,12 @@ double ArithmExpr::calculate() {
 		}
 	}
 	if (s.empty())
-		throw parser_error{ "parse : empty expression result" };
+		throw calc_exception{ "ArithmExpr::calculate() : empty expression result" };
 	auto t = s.pop();
 	if (!s.empty())
-		throw parser_error{ "parse : uncompleted expression" };
+		throw calc_exception{ "ArithmExpr::calculate() : uncompleted expression" };
 	if (t.get_type() != TokenType::Name && t.get_type() != TokenType::Number)
-		throw parser_error{ "parse : incorrect expression" };
+		throw calc_exception{ "ArithmExpr::calculate() : incorrect expression" };
 	return get_value(t);
 }
 

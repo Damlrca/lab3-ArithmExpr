@@ -1,7 +1,5 @@
 #include "parser.hpp"
 
-#include <map>
-
 using namespace std;
 
 ostream& operator<<(ostream& out, const Token& t) {
@@ -71,7 +69,6 @@ vector<Token> lex(const string& input) {
 		{
 			string temp;
 			if ((input[i] >= '0' && input[i] <= '9') || input[i] == '.') {
-				// 111.222e-333
 				while (i < size && input[i] >= '0' && input[i] <= '9') {
 					temp += input[i];
 					i++;
@@ -100,7 +97,7 @@ vector<Token> lex(const string& input) {
 					res.push_back(Token{ TokenType::Number, stod(temp) });
 				}
 				catch (...) {
-					throw lexer_error{ "lex : incorrect real number format" };
+					throw calc_exception{ "lex : incorrect real number format" };
 				}
 			}
 			else if ( input[i] == '_' ||
@@ -117,7 +114,7 @@ vector<Token> lex(const string& input) {
 				res.push_back(Token{ TokenType::Name, temp });
 			}
 			else {
-				throw lexer_error{ "lex : unknown symbol" };
+				throw calc_exception{ "lex : unknown symbol '" + std::string{input[i]} + "'" };
 			}
 		}
 			break;
@@ -131,11 +128,11 @@ bool Compare_Operators_Tokens(const Token& comp, const Token& basis) {
 	if (comp.get_type() != TokenType::Un_Operator &&
 		comp.get_type() != TokenType::Bn_Operator &&
 		comp.get_type() != TokenType::Sp_Operator)
-		throw cmp_error{ "Operator_cmp() : comparable Token TokenType is not Operator" };
+		throw calc_exception{ "cmp : comparable Token TokenType is not Operator" };
 	if (basis.get_type() != TokenType::Un_Operator &&
 		basis.get_type() != TokenType::Bn_Operator &&
 		basis.get_type() != TokenType::Sp_Operator)
-		throw cmp_error{ "Operator_cmp() : basis Token TokenType is not Operator" };
+		throw calc_exception{ "cmp : basis Token TokenType is not Operator" };
 
 	if (comp.get_type() == TokenType::Sp_Operator)
 		return false;
@@ -156,16 +153,17 @@ bool Compare_Operators_Tokens(const Token& comp, const Token& basis) {
 }
 
 vector<Token> parse(const vector<Token>& input) {
-	check_expr_correctness(input);
+	check_infix_expr_correctness(input);
 
 	vector<Token> res;
 
 	int size = input.size();
 	Stack<Token> s;
 
+	bool end = false;
+
 	for (int i = 0; i < size; i++) {
-		if (!res.empty() && res.back().get_type() == TokenType::End)
-			break;
+		if (end) break;
 
 		switch (input[i].get_type())
 		{
@@ -191,7 +189,7 @@ vector<Token> parse(const vector<Token>& input) {
 					s.pop();
 				}
 				else {
-					throw parser_error{ "parse : missing '(' operator" };
+					throw calc_exception{ "parse : missing '(' operator" };
 				}
 			}
 			else if (input[i].get_str() == "=") {
@@ -201,28 +199,125 @@ vector<Token> parse(const vector<Token>& input) {
 				s.push(input[i]);
 			}
 			else {
-				throw parser_error{ "parse : unknown special operation" };
+				throw calc_exception{ "parse : unknown special operation" };
 			}
 			break;
 		case TokenType::End:
-			while (!s.empty())
-				res.push_back(s.pop());
-			res.push_back(input[i]);
+			end = true;
 			break;
 		default:
+			throw calc_exception{ "parse : unknown TokenType" };
 			break;
 		}
 	}
 
 	while (!s.empty()) {
 		if (s.top().get_str() == "(") {
-			throw parser_error{ "parse : missing ')' operator" };
+			throw calc_exception{ "parse : missing ')' operator" };
 		}
 		res.push_back(s.pop());
 	}
-	
+
+	check_postfix_expr_correctness(res);
+
+	return res;
+}
+
+void check_infix_expr_correctness(const vector<Token>& input) {
+	int size = input.size();
+	int cnt_parenthesis = 0;
+
+	bool end = false;
+
+	for (int i = 0; i < size; i++) {
+		if (end) break;
+
+		switch (input[i].get_type())
+		{
+		case TokenType::Un_Operator:
+			if (i + 1 == size || (
+				input[i + 1].get_type() != TokenType::Un_Operator &&
+				input[i + 1].get_type() != TokenType::Number &&
+				input[i + 1].get_type() != TokenType::Name &&
+				input[i + 1].get_str() != "(" ))
+				throw calc_exception{ "check_inf : missing operand of unary operation '" + input[i].get_str() + "'"};
+			break;
+		case TokenType::Bn_Operator:
+			if (i == 0 || (
+				input[i - 1].get_type() != TokenType::Number &&
+				input[i - 1].get_type() != TokenType::Name &&
+				input[i - 1].get_str() != ")"))
+				throw calc_exception{ "check_inf : missing left operand of binary operation '" + input[i].get_str() + "'" };
+			if (i + 1 == size || (
+				input[i + 1].get_type() != TokenType::Un_Operator &&
+				input[i + 1].get_type() != TokenType::Number &&
+				input[i + 1].get_type() != TokenType::Name &&
+				input[i + 1].get_str() != "("))
+				throw calc_exception{ "check_inf : missing right operand of binary operation '" + input[i].get_str() + "'" };
+			break;
+		case TokenType::Sp_Operator:
+			if (input[i].get_str() == "(") {
+				cnt_parenthesis++;
+				if (i > 0 && (
+					input[i - 1].get_type() == TokenType::Number ||
+					input[i - 1].get_type() == TokenType::Name ||
+					input[i - 1].get_str() == ")") )
+					throw calc_exception{ "check_inf : missing operator between operand ans '('" };
+			}
+			else if (input[i].get_str() == ")") {
+				if (cnt_parenthesis == 0)
+					throw calc_exception{ "check_inf : missing '(' operator" };
+				cnt_parenthesis--;
+				if (input[i - 1].get_str() == "(")
+					throw calc_exception{ "check_inf : empty '()'" };
+			}
+			else if (input[i].get_str() == "=") {
+				if (i == 0 || input[i - 1].get_type() != TokenType::Name)
+					throw calc_exception{ "check_inf : missing left operand of special operation '='" };
+				if (i + 1 == size || (
+					input[i + 1].get_type() != TokenType::Un_Operator &&
+					input[i + 1].get_type() != TokenType::Number &&
+					input[i + 1].get_type() != TokenType::Name &&
+					input[i + 1].get_str() != "("))
+					throw calc_exception{ "check_inf : missing right operand of special operation '='" };
+			}
+			else {
+				throw calc_exception{ "check_inf : unknown special operation" };
+			}
+			break;
+		case TokenType::Number:
+		case TokenType::Name:
+			if (i > 0 && (
+				input[i - 1].get_type() == TokenType::Name ||
+				input[i - 1].get_type() == TokenType::Number ||
+				input[i - 1].get_str() == ")"))
+				throw calc_exception{ "check_inf : wrong Token before operand" };
+			if (i + 1 < size && (
+				input[i + 1].get_type() == TokenType::Name ||
+				input[i + 1].get_type() == TokenType::Number ||
+				input[i + 1].get_type() == TokenType::Un_Operator ||
+				input[i + 1].get_str() == "("))
+				throw calc_exception{ "check_inf : wrong Token next to operand" };
+			break;
+		case TokenType::End:
+			end = true;
+			break;
+		default:
+			throw calc_exception{ "check_inf : unknown TokenType" };
+			break;
+		}
+	}
+	if (cnt_parenthesis > 0)
+		throw calc_exception{ "check_inf : missing ')' operator" };
+}
+
+void check_postfix_expr_correctness(const vector<Token>& input) {
 	Stack<Token> test;
-	for (const auto& o : res) {
+	bool end = false;
+
+	for (const auto& o : input) {
+		if (end) break;
+
 		switch (o.get_type())
 		{
 		case TokenType::Number:
@@ -232,7 +327,7 @@ vector<Token> parse(const vector<Token>& input) {
 		case TokenType::Un_Operator:
 		{
 			if (test.empty())
-				throw parser_error{ "parse : missing operand of unary operation '" + o.get_str() + "'" };
+				throw calc_exception{ "check_post : missing operand of unary operation '" + o.get_str() + "'" };
 			auto x = test.pop();
 			test.push(Token{ TokenType::Number, 0 });
 			break;
@@ -240,10 +335,10 @@ vector<Token> parse(const vector<Token>& input) {
 		case TokenType::Bn_Operator:
 		{
 			if (test.empty())
-				throw parser_error{ "parse : missing operand of binary operation '" + o.get_str() + "'" };
+				throw calc_exception{ "check_post : missing operand of binary operation '" + o.get_str() + "'" };
 			auto Y = test.pop();
 			if (test.empty())
-				throw parser_error{ "parse : missing operand of binary operation '" + o.get_str() + "'" };
+				throw calc_exception{ "check_post : missing operand of binary operation '" + o.get_str() + "'" };
 			auto X = test.pop();
 			test.push(Token{ TokenType::Number, 0 });
 			break;
@@ -251,105 +346,33 @@ vector<Token> parse(const vector<Token>& input) {
 		case TokenType::Sp_Operator:
 		{
 			if (o.get_str() != "=")
-				throw parser_error{ "parse : unexpected special operation '" + o.get_str() + "'" };
+				throw calc_exception{ "check_post : unexpected special operation '" + o.get_str() + "'" };
 			if (test.empty())
-				throw parser_error{ "parse : missing operand of special operation '" + o.get_str() + "'" };
+				throw calc_exception{ "check_post : missing operand of special operation '='" };
 			auto Y = test.pop();
 			if (test.empty())
-				throw parser_error{ "parse : missing operand of special operation '" + o.get_str() + "'" };
+				throw calc_exception{ "check_post : missing operand of special operation '='" };
 			auto X = test.pop();
 			if (X.get_type() != TokenType::Name)
-				throw parser_error{ "parse : left operand of special operation '" + o.get_str() + "' is not Name" };
+				throw calc_exception{ "check_post : left operand of special operation '=' is not Name" };
 			test.push(X);
 			break;
 		}
 		case TokenType::End:
+			end = true;
 			break;
 		default:
+			throw calc_exception{ "check_post : unknown TokenType" };
 			break;
 		}
 	}
+
 	if (test.empty())
-		throw parser_error{ "parse : empty expression result" };
+		throw calc_exception{ "check_post : empty expression result" };
 	auto t = test.pop();
 	if (!test.empty())
-		throw parser_error{ "parse : uncompleted expression" };
+		throw calc_exception{ "check_post : uncompleted expression" };
+
 	if (t.get_type() != TokenType::Name && t.get_type() != TokenType::Number)
-		throw parser_error{ "parse : incorrect expression" };
-
-	return res;
-}
-
-void check_expr_correctness(const vector<Token>& input) {
-	int cnt_parenthesis = 0;
-	int size = input.size();
-	for (int i = 0; i < size; i++) {
-		switch (input[i].get_type())
-		{
-		case TokenType::Un_Operator:
-			if (i + 1 == size || (
-				input[i + 1].get_type() != TokenType::Un_Operator &&
-				input[i + 1].get_type() != TokenType::Number &&
-				input[i + 1].get_type() != TokenType::Name &&
-				input[i + 1].get_str() != "(" ))
-				throw check_error{ "check : missing operand of unary operation '" + input[i].get_str() + "'"};
-			break;
-		case TokenType::Bn_Operator:
-			if (i == 0 || (
-				input[i - 1].get_type() != TokenType::Number &&
-				input[i - 1].get_type() != TokenType::Name &&
-				input[i - 1].get_str() != ")"))
-				throw check_error{ "check : missing left operand of binary operation '" + input[i].get_str() + "'" };
-			if (i + 1 == size || (
-				input[i + 1].get_type() != TokenType::Un_Operator &&
-				input[i + 1].get_type() != TokenType::Number &&
-				input[i + 1].get_type() != TokenType::Name &&
-				input[i + 1].get_str() != "("))
-				throw check_error{ "check : missing right operand of binary operation '" + input[i].get_str() + "'" };
-			break;
-		case TokenType::Sp_Operator:
-			if (input[i].get_str() == "(") {
-				cnt_parenthesis++;
-				if (i > 0 && (
-					input[i - 1].get_type() == TokenType::Number ||
-					input[i - 1].get_type() == TokenType::Name))
-					throw check_error{ "check : missing operator between operand ans '('" };
-			}
-			else if (input[i].get_str() == ")") {
-				if (cnt_parenthesis == 0)
-					throw check_error{ "check : missing '(' operator" };
-				cnt_parenthesis--;
-				if (input[i - 1].get_str() == "(")
-					throw check_error{ "check : empty '()'" };
-			}
-			else if (input[i].get_str() == "=") {
-				if (i == 0 || input[i - 1].get_type() != TokenType::Name)
-					throw check_error{ "check : missing left operand of special operation '" + input[i].get_str() + "'" };
-				if (i + 1 == size || (
-					input[i + 1].get_type() != TokenType::Un_Operator &&
-					input[i + 1].get_type() != TokenType::Number &&
-					input[i + 1].get_type() != TokenType::Name &&
-					input[i + 1].get_str() != "("))
-					throw check_error{ "check : missing right operand of special operation '" + input[i].get_str() + "'" };
-			}
-			else {
-				throw check_error{ "check : unknown special operation" };
-			}
-			break;
-		case TokenType::Number:
-		case TokenType::Name:
-			if (i + 1 < size && (
-				input[i + 1].get_type() == TokenType::Name ||
-				input[i + 1].get_type() == TokenType::Number))
-				throw parser_error{ "check : missing operator between two operands" };
-			break;
-		case TokenType::End:
-
-			break;
-		default:
-			break;
-		}
-	}
-	if (cnt_parenthesis > 0)
-		throw check_error{ "check : missing ')' operator" };
+		throw calc_exception{ "check_post : incorrect expression" };
 }

@@ -4,18 +4,12 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <sstream>
 #include <map>
 #include "parser.hpp"
 #include "Stack.hpp"
 #include "Queue.hpp"
 
 extern std::map<std::string, double> table;
-
-class ArithmExpr_error : public parser_lib_exception {
-public:
-	ArithmExpr_error(std::string _s) : parser_lib_exception{ _s } {}
-};
 
 class ArithmExpr {
 private:
