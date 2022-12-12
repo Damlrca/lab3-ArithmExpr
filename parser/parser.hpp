@@ -10,7 +10,7 @@ class calc_exception {
 	std::string s;
 public:
 	calc_exception(const std::string& _s) : s{_s} {}
-	std::string get_str() { return s; };
+	std::string get_str() const { return s; };
 };
 
 enum class TokenType {

@@ -97,7 +97,7 @@ vector<Token> lex(const string& input) {
 					res.push_back(Token{ TokenType::Number, stod(temp) });
 				}
 				catch (...) {
-					throw calc_exception{ "lex : incorrect real number format" };
+					throw calc_exception{ "lex : incorrect real number format : '" + temp + "' : ~input[" + to_string(i) + "]"};
 				}
 			}
 			else if ( input[i] == '_' ||
@@ -114,7 +114,7 @@ vector<Token> lex(const string& input) {
 				res.push_back(Token{ TokenType::Name, temp });
 			}
 			else {
-				throw calc_exception{ "lex : unknown symbol '" + std::string{input[i]} + "'" };
+				throw calc_exception{ "lex : unknown symbol '" + string{input[i]} + "' : input[" + to_string(i) + "]" };
 			}
 		}
 			break;
@@ -153,8 +153,6 @@ bool Compare_Operators_Tokens(const Token& comp, const Token& basis) {
 }
 
 vector<Token> parse(const vector<Token>& input) {
-	check_infix_expr_correctness(input);
-
 	vector<Token> res;
 
 	int size = input.size();
@@ -199,7 +197,7 @@ vector<Token> parse(const vector<Token>& input) {
 				s.push(input[i]);
 			}
 			else {
-				throw calc_exception{ "parse : unknown special operation" };
+				throw calc_exception{ "parse : unknown special operation '" + input[i].get_str() + "'" };
 			}
 			break;
 		case TokenType::End:
@@ -217,8 +215,6 @@ vector<Token> parse(const vector<Token>& input) {
 		}
 		res.push_back(s.pop());
 	}
-
-	check_postfix_expr_correctness(res);
 
 	return res;
 }
@@ -239,21 +235,21 @@ void check_infix_expr_correctness(const vector<Token>& input) {
 				input[i + 1].get_type() != TokenType::Un_Operator &&
 				input[i + 1].get_type() != TokenType::Number &&
 				input[i + 1].get_type() != TokenType::Name &&
-				input[i + 1].get_str() != "(" ))
-				throw calc_exception{ "check_inf : missing operand of unary operation '" + input[i].get_str() + "'"};
+				input[i + 1].get_str() != "("))
+				throw calc_exception{ "check_inf : missing operand of unary operation '" + input[i].get_str() + "' : infix[" + to_string(i + 1) + "]" };
 			break;
 		case TokenType::Bn_Operator:
 			if (i == 0 || (
 				input[i - 1].get_type() != TokenType::Number &&
 				input[i - 1].get_type() != TokenType::Name &&
 				input[i - 1].get_str() != ")"))
-				throw calc_exception{ "check_inf : missing left operand of binary operation '" + input[i].get_str() + "'" };
+				throw calc_exception{ "check_inf : missing left operand of binary operation '" + input[i].get_str() + "' : infix[" + to_string(i + 1) + "]" };
 			if (i + 1 == size || (
 				input[i + 1].get_type() != TokenType::Un_Operator &&
 				input[i + 1].get_type() != TokenType::Number &&
 				input[i + 1].get_type() != TokenType::Name &&
 				input[i + 1].get_str() != "("))
-				throw calc_exception{ "check_inf : missing right operand of binary operation '" + input[i].get_str() + "'" };
+				throw calc_exception{ "check_inf : missing right operand of binary operation '" + input[i].get_str() + "' : infix[" + to_string(i + 1) + "]" };
 			break;
 		case TokenType::Sp_Operator:
 			if (input[i].get_str() == "(") {
@@ -262,27 +258,27 @@ void check_infix_expr_correctness(const vector<Token>& input) {
 					input[i - 1].get_type() == TokenType::Number ||
 					input[i - 1].get_type() == TokenType::Name ||
 					input[i - 1].get_str() == ")") )
-					throw calc_exception{ "check_inf : missing operator between operand ans '('" };
+					throw calc_exception{ "check_inf : missing operator between Token ans '(' : infix[" + to_string(i + 1) + "]" };
 			}
 			else if (input[i].get_str() == ")") {
 				if (cnt_parenthesis == 0)
-					throw calc_exception{ "check_inf : missing '(' operator" };
+					throw calc_exception{ "check_inf : missing '(' operator : infix[" + to_string(i + 1) + "]" };
 				cnt_parenthesis--;
 				if (input[i - 1].get_str() == "(")
-					throw calc_exception{ "check_inf : empty '()'" };
+					throw calc_exception{ "check_inf : empty '()' : infix[" + to_string(i + 1) + "]" };
 			}
 			else if (input[i].get_str() == "=") {
 				if (i == 0 || input[i - 1].get_type() != TokenType::Name)
-					throw calc_exception{ "check_inf : missing left operand of special operation '='" };
+					throw calc_exception{ "check_inf : missing left operand of special operation '=' : infix[" + to_string(i + 1) + "]" };
 				if (i + 1 == size || (
 					input[i + 1].get_type() != TokenType::Un_Operator &&
 					input[i + 1].get_type() != TokenType::Number &&
 					input[i + 1].get_type() != TokenType::Name &&
 					input[i + 1].get_str() != "("))
-					throw calc_exception{ "check_inf : missing right operand of special operation '='" };
+					throw calc_exception{ "check_inf : missing right operand of special operation '=' : infix[" + to_string(i + 1) + "]" };
 			}
 			else {
-				throw calc_exception{ "check_inf : unknown special operation" };
+				throw calc_exception{ "check_inf : unknown special operation : infix[" + to_string(i + 1) + "]" };
 			}
 			break;
 		case TokenType::Number:
@@ -291,19 +287,19 @@ void check_infix_expr_correctness(const vector<Token>& input) {
 				input[i - 1].get_type() == TokenType::Name ||
 				input[i - 1].get_type() == TokenType::Number ||
 				input[i - 1].get_str() == ")"))
-				throw calc_exception{ "check_inf : wrong Token before operand" };
+				throw calc_exception{ "check_inf : wrong Token before operand : infix[" + to_string(i + 1) + "]" };
 			if (i + 1 < size && (
 				input[i + 1].get_type() == TokenType::Name ||
 				input[i + 1].get_type() == TokenType::Number ||
 				input[i + 1].get_type() == TokenType::Un_Operator ||
 				input[i + 1].get_str() == "("))
-				throw calc_exception{ "check_inf : wrong Token next to operand" };
+				throw calc_exception{ "check_inf : wrong Token after operand : infix[" + to_string(i + 1) + "]" };
 			break;
 		case TokenType::End:
 			end = true;
 			break;
 		default:
-			throw calc_exception{ "check_inf : unknown TokenType" };
+			throw calc_exception{ "check_inf : unknown TokenType : infix[" + to_string(i + 1) + "]" };
 			break;
 		}
 	}
@@ -315,6 +311,7 @@ void check_postfix_expr_correctness(const vector<Token>& input) {
 	Stack<Token> test;
 	bool end = false;
 
+	int i = 0;
 	for (const auto& o : input) {
 		if (end) break;
 
@@ -327,7 +324,7 @@ void check_postfix_expr_correctness(const vector<Token>& input) {
 		case TokenType::Un_Operator:
 		{
 			if (test.empty())
-				throw calc_exception{ "check_post : missing operand of unary operation '" + o.get_str() + "'" };
+				throw calc_exception{ "check_post : missing operand of unary operation '" + o.get_str() + "' : postfix[" + to_string(i + 1) + "]" };
 			auto x = test.pop();
 			test.push(Token{ TokenType::Number, 0 });
 			break;
@@ -335,10 +332,10 @@ void check_postfix_expr_correctness(const vector<Token>& input) {
 		case TokenType::Bn_Operator:
 		{
 			if (test.empty())
-				throw calc_exception{ "check_post : missing operand of binary operation '" + o.get_str() + "'" };
+				throw calc_exception{ "check_post : missing operand of binary operation '" + o.get_str() + "' : postfix[" + to_string(i + 1) + "]" };
 			auto Y = test.pop();
 			if (test.empty())
-				throw calc_exception{ "check_post : missing operand of binary operation '" + o.get_str() + "'" };
+				throw calc_exception{ "check_post : missing operand of binary operation '" + o.get_str() + "' : postfix[" + to_string(i + 1) + "]" };
 			auto X = test.pop();
 			test.push(Token{ TokenType::Number, 0 });
 			break;
@@ -346,15 +343,15 @@ void check_postfix_expr_correctness(const vector<Token>& input) {
 		case TokenType::Sp_Operator:
 		{
 			if (o.get_str() != "=")
-				throw calc_exception{ "check_post : unexpected special operation '" + o.get_str() + "'" };
+				throw calc_exception{ "check_post : unexpected special operation '" + o.get_str() + "' : postfix[" + to_string(i + 1) + "]" };
 			if (test.empty())
-				throw calc_exception{ "check_post : missing operand of special operation '='" };
+				throw calc_exception{ "check_post : missing operand of special operation '=' : postfix[" + to_string(i + 1) + "]" };
 			auto Y = test.pop();
 			if (test.empty())
-				throw calc_exception{ "check_post : missing operand of special operation '='" };
+				throw calc_exception{ "check_post : missing operand of special operation '=' : postfix[" + to_string(i + 1) + "]" };
 			auto X = test.pop();
 			if (X.get_type() != TokenType::Name)
-				throw calc_exception{ "check_post : left operand of special operation '=' is not Name" };
+				throw calc_exception{ "check_post : left operand of special operation '=' is not Name : postfix[" + to_string(i + 1) + "]" };
 			test.push(X);
 			break;
 		}
@@ -362,9 +359,11 @@ void check_postfix_expr_correctness(const vector<Token>& input) {
 			end = true;
 			break;
 		default:
-			throw calc_exception{ "check_post : unknown TokenType" };
+			throw calc_exception{ "check_post : unknown TokenType : postfix[" + to_string(i + 1) + "]" };
 			break;
 		}
+
+		i++;
 	}
 
 	if (test.empty())
