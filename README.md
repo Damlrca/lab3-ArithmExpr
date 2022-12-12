@@ -5,6 +5,7 @@
 **Commands**:
 - `calc Expr-list`
 - `debug` - turns on or off debugging mode
+- `print` - turns on or off print mode
 - `exit`
 
 ## Arithmetic Expression syntax:

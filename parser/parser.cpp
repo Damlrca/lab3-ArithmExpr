@@ -97,7 +97,7 @@ vector<Token> lex(const string& input) {
 					res.push_back(Token{ TokenType::Number, stod(temp) });
 				}
 				catch (...) {
-					throw calc_exception{ "lex : incorrect real number format : '" + temp + "'"};
+					throw calc_exception{ "lex : incorrect real number format : '" + temp + "' : ~input[" + to_string(i) + "]"};
 				}
 			}
 			else if ( input[i] == '_' ||
@@ -114,7 +114,7 @@ vector<Token> lex(const string& input) {
 				res.push_back(Token{ TokenType::Name, temp });
 			}
 			else {
-				throw calc_exception{ "lex : unknown symbol '" + string{input[i]} + "'" };
+				throw calc_exception{ "lex : unknown symbol '" + string{input[i]} + "' : input[" + to_string(i) + "]" };
 			}
 		}
 			break;

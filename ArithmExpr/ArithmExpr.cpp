@@ -137,7 +137,13 @@ double ArithmExpr::calculate() const {
 vector<ArithmExpr> get_ArithmExpr_vector(const string& str, bool debug_mode, ostream& out) {
 	vector<ArithmExpr> res;
 
-	auto l = lex(str);
+	vector<Token> l;
+	try {
+		l = lex(str);
+	}
+	catch (calc_exception& c) {
+		throw calc_exception{ "lexer error : " + c.get_str() };
+	}
 
 	if (l.empty() || l.back().get_type() != TokenType::End)
 		l.push_back(Token{ TokenType::End });
@@ -152,9 +158,21 @@ vector<ArithmExpr> get_ArithmExpr_vector(const string& str, bool debug_mode, ost
 				for (const auto& o : temp)
 					out << o << endl;
 			}
-	
-			check_infix_expr_correctness(temp); // !!!
-			auto p = parse(temp);
+			
+			try {
+				check_infix_expr_correctness(temp); // !!!
+			}
+			catch (calc_exception& c) {
+				throw calc_exception{ "lexed Expr No." + to_string(res.size() + 1) + " : " + c.get_str() };
+			}
+
+			vector<Token> p;
+			try {
+				p = parse(temp);
+			}
+			catch (calc_exception& c) {
+				throw calc_exception{ "parser Expr No." + to_string(res.size() + 1) + " : " + c.get_str() };
+			}
 
 			if (debug_mode) {
 				out << "parsed Expr No." << res.size() + 1 << " ( " << p.size() << " Tokens ) :" << endl;
@@ -162,7 +180,13 @@ vector<ArithmExpr> get_ArithmExpr_vector(const string& str, bool debug_mode, ost
 					out << o << endl;
 			}
 			
-			check_postfix_expr_correctness(p); // !!!
+			try {
+				check_postfix_expr_correctness(p); // !!!
+			}
+			catch (calc_exception& c) {
+				throw calc_exception{ "parsed Expr No." + to_string(res.size() + 1) + " : " + c.get_str() };
+			}
+
 			res.push_back(ArithmExpr{ move(temp),move(p) });
 			temp.clear();
 
