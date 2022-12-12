@@ -14,11 +14,10 @@ int main() {
 		if (command == "calc") {
 			try {
 				auto temp = get_ArithmExpr_vector(expr, debug_mode);
-				int number = 0;
-				for (const auto& o : temp) {
-					cout << "Expr No." << ++number << ": ";
-					if (debug_mode) {
-						cout << endl;
+				if (!debug_mode) {
+					int number = 0;
+					for (const auto& o : temp) {
+						cout << "Expr No." << ++number << ": " << endl;
 						cout << "infix: \" ";
 						o.print_infix();
 						cout << " \"" << endl;
@@ -26,8 +25,8 @@ int main() {
 						o.print_postfix();
 						cout << " \"" << endl;
 						cout << "result: ";
+						cout << o.calculate() << endl;
 					}
-					cout << o.calculate() << endl;
 				}
 			}
 			catch (calc_exception& c) {

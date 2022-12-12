@@ -153,6 +153,7 @@ vector<ArithmExpr> get_ArithmExpr_vector(const string& str, bool debug_mode, ost
 					out << o << endl;
 			}
 	
+			check_infix_expr_correctness(temp); // !!!
 			auto p = parse(temp);
 
 			if (debug_mode) {
@@ -161,8 +162,14 @@ vector<ArithmExpr> get_ArithmExpr_vector(const string& str, bool debug_mode, ost
 					out << o << endl;
 			}
 			
+			check_postfix_expr_correctness(p); // !!!
 			res.push_back(ArithmExpr{ move(temp),move(p) });
 			temp.clear();
+
+			if (debug_mode) {
+				out << "result Expr No." << res.size() << ": " << res.back().calculate() << endl;
+			}
+
 		}
 	}
 

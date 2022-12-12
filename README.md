@@ -43,9 +43,13 @@
 ## parser library functions
 
 - lex: `string (infix, Expr-list) -> vector<Token> (infix, Expr-list)`
-- parse: `vector<Token> (infix, Expr) -> vector<Token> (postfix, Expr)`
+
 - check_infix_expr_correctness: `vector<Token> (infix, Expr)`
 	- throws when infix expr is incorrect
+
+- parse: `vector<Token> (infix, Expr) -> vector<Token> (postfix, Expr)`
+	- `vector<Token> (infix, Expr)` should be correct, check it using `check_infix_expr_correctness`
+	
 - check_postfix_expr_correctness: `vector<Token> (postfix, Expr)`
 	- throws when postfix expr is incorrect
 
@@ -55,6 +59,8 @@ ArithmExpr.hpp:
 ## ArithmExpr class
 
 - constructor `ArithmExpr(vector<Token> (infix, Expr), vector<Token> (postfix, Expr))`
+	- `vector<Token> (infix, Expr)` and `vector<Token> (postfix, Expr)` should be correct,
+	check it using `check_infix_expr_correctness` and `check_postfix_expr_correctness`
 - print_infix
 - print_postix
 - calculate
